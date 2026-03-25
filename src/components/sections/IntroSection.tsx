@@ -11,6 +11,7 @@ export default function IntroSection({
   content: IntroContent;
   anchorId?: string;
 }) {
+  console.log("IntroSection content :", content)
   return (
     <section className="intro-section section-shell" id={anchorId ?? undefined}>
       <div className="intro-section__content">
@@ -33,6 +34,11 @@ export default function IntroSection({
               </li>
             ))}
           </ul>
+          <div className="intro-section__more">
+            <span>Read More About Us</span>
+            <SimpleIcon name="right-arrow" className="intro-section__check"/>
+            
+          </div>
         </div>
         <div className="intro-section__media">
           <div className="intro-section__media-shadow"></div>
@@ -44,6 +50,10 @@ export default function IntroSection({
             decoding="async"
             className="intro-section__image"
           />
+          <div className="intro-section__stats">
+            <span className="count">15+</span>
+            <span className="year">YEARS OF INSIGHT</span>
+          </div>
         </div>
       </div>
     </section>

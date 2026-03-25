@@ -47,7 +47,10 @@ export default function SimpleIcon({
     case "trading":
       return (
         <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 17h4V7H4v10zm6 0h4V4h-4v13zm6 0h4V10h-4v7z" fill="currentColor" />
+          <path
+            d="M4 17h4V7H4v10zm6 0h4V4h-4v13zm6 0h4V10h-4v7z"
+            fill="currentColor"
+          />
         </svg>
       );
     case "security":
@@ -184,6 +187,15 @@ export default function SimpleIcon({
             fill="currentColor"
           />
         </svg>
+      );
+    case "right-arrow":
+      return (
+       <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+  <path
+    d="M5 12h11l-4-4 1-1 6 6-6 6-1-1 4-4H5z"
+    fill="currentColor"
+  />
+</svg>
       );
     default:
       return null;

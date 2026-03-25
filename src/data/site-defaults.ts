@@ -1,6 +1,7 @@
 /** Shared defaults for seed + UI fallback when DB is empty. */
 export const defaultNavItems = [
   { label: "Home", href: "/" },
+  { label: "Industries", href: "/industries" },
   { label: "Services", href: "/services" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
@@ -28,7 +29,10 @@ export const defaultFooterColumns = [
   {
     title: "Contact Information",
     contact: [
-      { type: "location" as const, value: "Level 42, Emirates Towers, Sheikh Zayed Rd, Dubai, UAE" },
+      {
+        type: "location" as const,
+        value: "Level 42, Emirates Towers, Sheikh Zayed Rd, Dubai, UAE",
+      },
       { type: "phone" as const, value: "+971 4 000 0000" },
       { type: "mail" as const, value: "info@owtc-fze.com" },
     ],

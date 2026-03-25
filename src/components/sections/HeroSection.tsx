@@ -28,10 +28,10 @@ export default function HeroSection({
       <div className="hero-section__overlay"></div>
       <div className="hero-section__content section-shell">
         <div className="hero-section__copy">
-          <div className="hero-section__badge">
+          {/* <div className="hero-section__badge">
             <SimpleIcon name="spark" className="hero-section__badge-icon" />
             <span>{content.badge}</span>
-          </div>
+          </div> */}
           <h1 className="hero-section__title">
             {content.title.map((line) => (
               <span key={line}>{line}</span>

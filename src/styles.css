@@ -3,7 +3,8 @@
   --color-border: #e2e8f0;
   --color-primary: #0b3d91;
   --color-primary-dark: #0a1f44;
-  --color-accent: #c8a96a;
+  /* --color-accent: #c8a96a; */
+  --color-accent:#C9A14A;
   --color-brand-green: #00a86b;
   --color-text: #2b2b2b;
   --color-text-muted: #64748b;
@@ -14,7 +15,8 @@
   --header-height: 80px;
   --logo-size: 75px;
   --radius-logo: 11px;
-  --font-display: "Montserrat", "Avenir Next", "Segoe UI", sans-serif;
+  /* --font-display: "Montserrat", "Avenir Next", "Segoe UI", sans-serif; */
+  --font-display: "Inter", sans-serif;
   --font-body: "Open Sans", "Segoe UI", sans-serif;
   --shadow-soft: 0 12px 24px rgba(15, 23, 42, 0.08);
   --shadow-card: 0 16px 40px rgba(15, 23, 42, 0.06);
@@ -142,7 +144,7 @@ button {
 }
 
 .button--gold {
-  color: #ffffff;
+  color: var(--color-primary-dark);
   background: var(--color-accent);
   box-shadow: 0 10px 18px rgba(200, 169, 106, 0.28);
 }
@@ -173,11 +175,25 @@ button {
 .site-header__inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   gap: 2rem;
   min-height: var(--header-height);
-  max-width: var(--shell-width);
+  /* max-width: var(--shell-width); */
   margin: 0 auto;
+}
+.header-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  border-radius: 8px;
+  height: 44px;
+  width: 120px;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  border:none;
 }
 
 .brand {
@@ -188,25 +204,40 @@ button {
 }
 
 .brand__logo-frame {
-  width: var(--logo-size);
-  height: var(--logo-size);
-  flex: 0 0 auto;
+  /* width: var(--logo-size); */
+  /* height: var(--logo-size); */
+  /* flex: 0 0 auto; */
   overflow: hidden;
-  border-radius: var(--radius-logo);
+  /* border-radius: var(--radius-logo); */
 }
 
 .brand__logo {
-  width: 100%;
-  height: 100%;
+  /* width: 100%; */
+  /* height: 100%; */
+  height: 30px;
+  width: 30px;
   object-fit: cover;
+}
+.brand__wordmark{
+  display: flex;
+  flex-direction: column;
+}
+.brand__wordmark span:last-child{
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .brand__title {
   display: inline-block;
-  color: var(--color-primary);
-  font-size: 20px;
-  line-height: 1.4;
-  letter-spacing: -0.5px;
+  color: #0A1F44;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 22.5px;
+  letter-spacing: -0.45px;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -218,22 +249,32 @@ button {
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 40px;
   flex: 0 0 auto;
 }
 
 .site-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   font-size: 14px;
   line-height: 20px;
+  font-weight: 600;
   transition: color 160ms ease;
 }
 
 .site-nav__link:hover,
 .site-nav__link:focus-visible,
 .site-nav__link--active {
-  color: var(--color-primary);
+  color: var(--color-accent);
+  
 }
-
+.underline{
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: var(--color-accent);
+}
 .site-nav__link:focus-visible,
 .menu-toggle:focus-visible {
   outline: 2px solid rgba(11, 61, 145, 0.35);
@@ -303,7 +344,11 @@ button {
   pointer-events: none;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 28%),
-    radial-gradient(circle at top right, rgba(200, 169, 106, 0.2), transparent 34%);
+    radial-gradient(
+      circle at top right,
+      rgba(200, 169, 106, 0.2),
+      transparent 34%
+    );
 }
 
 .hero-section__content {
@@ -311,12 +356,16 @@ button {
   z-index: 3;
   display: flex;
   align-items: center;
+  justify-content: center;
   min-height: 832px;
   padding-block: 72px 96px;
 }
 
 .hero-section__copy {
-  max-width: 737px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* max-width: 737px; */
 }
 
 .hero-section__badge {
@@ -341,22 +390,35 @@ button {
 .hero-section__title {
   margin: 24px 0 0;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 6vw, 4.5rem);
-  font-weight: 400;
-  line-height: 1;
+  /* font-size: clamp(3rem, 6vw, 4.5rem); */
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 60px;
   color: #ffffff;
+  text-align: center;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 5px 10px;
+}
+.hero-section__title span:first-child {
+  grid-column: 1/-1;
+}
+.hero-section__title span:last-child {
+  color: #c5a059;
 }
 
 .hero-section__title span {
-  display: block;
+  /* display: block; */
 }
 
 .hero-section__description {
   max-width: 640px;
   margin: 24px 0 0;
-  font-size: 1.25rem;
-  line-height: 1.4;
-  color: #f1f5f9;
+  font-weight: 400;
+  /* font-size: 1.25rem; */
+  font-size: 20px;
+  line-height: 32.5px;
+  color: #d1d5db;
 }
 
 .hero-section__actions {
@@ -390,6 +452,20 @@ button {
   margin: 32px 0 0;
   list-style: none;
 }
+.intro-section__more{
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 32px;
+
+}
+.intro-section__more span{
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: var(--color-primary-dark);
+}
 
 .intro-section__item {
   display: flex;
@@ -414,6 +490,31 @@ button {
 
 .intro-section__media {
   position: relative;
+}
+.intro-section__stats{
+  position: absolute;
+  bottom: -40px;
+  left:-30px;
+  background-color: var(--color-accent);
+  border-radius: 4px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+
+}
+.intro-section__stats .count{
+  font-weight: 700;
+  font-size: 36px;
+  line-height:40px;
+  color: var(--color-surface);
+}
+.intro-section__stats .year{
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0;
 }
 
 .intro-section__media-shadow {
@@ -453,7 +554,11 @@ button {
 }
 
 .about-hero__gradient {
-  background: linear-gradient(90deg, rgba(10, 31, 68, 0.82), rgba(10, 31, 68, 0.34));
+  background: linear-gradient(
+    90deg,
+    rgba(10, 31, 68, 0.82),
+    rgba(10, 31, 68, 0.34)
+  );
 }
 
 .about-hero__content {
@@ -699,7 +804,11 @@ button {
 }
 
 .contact-hero__gradient {
-  background: linear-gradient(90deg, rgba(10, 31, 68, 0.72), rgba(10, 31, 68, 0.28));
+  background: linear-gradient(
+    90deg,
+    rgba(10, 31, 68, 0.72),
+    rgba(10, 31, 68, 0.28)
+  );
 }
 
 .contact-hero__content {
@@ -770,7 +879,9 @@ button {
   border: 1px solid #f1f5f9;
   border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.08),
+    0 8px 10px -6px rgba(0, 0, 0, 0.08);
 }
 
 .contact-inquiry__form-title {
@@ -849,7 +960,9 @@ button {
   background: var(--color-primary-dark);
   color: #ffffff;
   cursor: pointer;
-  box-shadow: 0 10px 15px -3px rgba(11, 61, 145, 0.2), 0 4px 6px -4px rgba(11, 61, 145, 0.2);
+  box-shadow:
+    0 10px 15px -3px rgba(11, 61, 145, 0.2),
+    0 4px 6px -4px rgba(11, 61, 145, 0.2);
 }
 
 .contact-inquiry__submit:disabled {
@@ -1000,6 +1113,10 @@ button {
   border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border-top: 4px solid var(--color-primary-dark);
+}
+.service-card:nth-child(odd){
+  border-top-color: var(--color-accent);
 }
 
 .service-card__icon {
@@ -1084,8 +1201,13 @@ button {
 .investment-section {
   position: relative;
   padding-block: 96px;
-  background:
-    linear-gradient(90deg, rgba(10, 31, 68, 0.98) 0%, rgba(10, 31, 68, 0.98) 50%, rgba(18, 46, 89, 0.95) 50%, rgba(18, 46, 89, 0.95) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(10, 31, 68, 0.98) 0%,
+    rgba(10, 31, 68, 0.98) 50%,
+    rgba(18, 46, 89, 0.95) 50%,
+    rgba(18, 46, 89, 0.95) 100%
+  );
 }
 
 .investment-section::after {
@@ -1237,7 +1359,11 @@ button {
   border-radius: 16px;
   text-align: center;
   background:
-    radial-gradient(circle at top right, rgba(200, 169, 106, 0.18), transparent 30%),
+    radial-gradient(
+      circle at top right,
+      rgba(200, 169, 106, 0.18),
+      transparent 30%
+    ),
     linear-gradient(135deg, #0b3d91 0%, #0a1f44 100%);
 }
 
@@ -1410,7 +1536,11 @@ button {
   }
 
   .investment-section {
-    background: linear-gradient(180deg, rgba(10, 31, 68, 0.98) 0%, rgba(18, 46, 89, 0.95) 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(10, 31, 68, 0.98) 0%,
+      rgba(18, 46, 89, 0.95) 100%
+    );
   }
 
   .investment-section::after {

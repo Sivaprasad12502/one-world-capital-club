@@ -29,15 +29,19 @@ export default function SiteHeader({
             <img
               className="brand__logo"
               src={logoSrc}
-              alt="One World Trade Centre FZE logo"
-              width={256}
-              height={256}
+              alt="One World capital club"
+              width={30}
+              height={30}
               decoding="async"
             />
           </span>
           <span className="brand__wordmark">
             <span className="brand__title">
-              One World Trade Centre <span className="brand__title-accent">FZE</span>
+              {/* One World Trade Centre <span className="brand__title-accent">FZE</span> */}
+              ONE WORLD CAPITAL CLUB
+            </span>
+            <span>
+              L.L.C FZE
             </span>
           </span>
         </Link>
@@ -71,10 +75,14 @@ export default function SiteHeader({
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
+                {active &&(<span className="underline"></span>)}
               </Link>
             );
           })}
         </nav>
+        <button className="header-button">
+          Join Club
+        </button>
       </div>
     </header>
   );

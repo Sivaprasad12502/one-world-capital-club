@@ -23,7 +23,8 @@ export default async function MarketingLayout({
     defaultFooterColumns;
   const footerMeta =
     (global?.footerMeta as typeof defaultFooterMeta) ?? defaultFooterMeta;
-  const logoSrc = global?.logoSrc ?? "/home/logo.png";
+  // const logoSrc = global?.logoSrc ?? "/home/logo.png";
+  const logoSrc =  "/home/headerLogo.svg";
 
   return (
     <div className="owtc-app">

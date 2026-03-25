@@ -10,6 +10,7 @@ export default function ServicesSection({ content }: { content: ServicesContent 
       <div className="section-shell">
         <div className="section-heading">
           <h2 className="section-heading__title">{content.title}</h2>
+          <div className="section-accent"></div>
           <p className="section-heading__description">{content.description}</p>
         </div>
         <div className="services-grid">
