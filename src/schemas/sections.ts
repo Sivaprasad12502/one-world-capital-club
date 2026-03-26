@@ -53,31 +53,38 @@ export const servicesDataSchema = z.object({
 });
 
 export const whyChooseItemSchema = z.object({
-  index: z.string(),
-  title: z.string(),
-  description: z.string(),
+  title:z.string(),
+  // description: z.string().optional(),
+  icon: z.string(),
 });
 
 export const whyChooseDataSchema = z.object({
+  title:z.string(),
+  subheading:z.string().optional(),
   items: z.array(whyChooseItemSchema),
 });
 
 export const investmentDataSchema = z.object({
   id: z.string().optional(),
-  title: z.string(),
-  description: z.string(),
-  stats: z.array(z.object({ value: z.string(), label: z.string() })),
-  chart: z.object({
-    title: z.string(),
-    delta: z.string(),
-    labels: z.array(z.string()),
-    values: z.array(z.number()),
-  }),
+  heading: z.array(z.string()).min(1),
+  items: z
+    .array(
+      z.object({
+        icon: z.string(),
+        title: z.string(),
+        description: z.string(),
+      }),
+    )
+    .min(1),
+  quoteText: z.string(),
+  quoteAuthor: z.string(),
+  quoteRole: z.string(),
 });
 
 export const clientLogosDataSchema = z.object({
-  heading: z.string().optional(),
-  logos: z.array(z.string()),
+  title: z.string(),
+  subtitle: z.string(),
+  action: z.object({ label: z.string(), href: z.string() }),
 });
 
 export const ctaDataSchema = z.object({
@@ -188,9 +195,16 @@ export const siteGlobalPayloadSchema = z.object({
   footerMeta: z.object({
     brand: z.string(),
     description: z.string(),
-    social: z.array(z.string()),
+    social: z.array(
+      z.union([
+        z.string(),
+        z.object({ label: z.string(), href: z.string(), icon: z.string().optional() }),
+      ]),
+    ),
     copyright: z.string(),
-    legal: z.array(z.string()),
+    legal: z.array(
+      z.union([z.string(), z.object({ label: z.string(), href: z.string() })]),
+    ),
   }),
   logoSrc: z.string().optional(),
   featureFlags: z.record(z.string(), z.boolean()).optional(),

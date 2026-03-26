@@ -9,41 +9,37 @@ export const defaultNavItems = [
 
 export const defaultFooterColumns = [
   {
-    title: "Quick Links",
+    title: "Navigation",
     links: [
-      { label: "About Us", href: "/about" },
-      { label: "Our Services", href: "/services" },
-      { label: "Investment Portfolio", href: "/about" },
-      { label: "Latest Insights", href: "/contact" },
+      { label: "Our Investment Philosophy", href: "/about" },
+      { label: "Strategic Partnership", href: "/services" },
+      { label: "Sustainability Report", href: "/about" },
+      { label: "Global Presence", href: "/contact" },
     ],
   },
   {
-    title: "Solutions",
-    links: [
-      { label: "UAE Company Setup", href: "/services" },
-      { label: "Global Trade Compliance", href: "/services" },
-      { label: "Fintech Advisory", href: "/services" },
-      { label: "Security Consulting", href: "/services" },
-    ],
-  },
-  {
-    title: "Contact Information",
+    title: "Offices",
     contact: [
-      {
-        type: "location" as const,
-        value: "Level 42, Emirates Towers, Sheikh Zayed Rd, Dubai, UAE",
-      },
-      { type: "phone" as const, value: "+971 4 000 0000" },
-      { type: "mail" as const, value: "info@owtc-fze.com" },
+      { type: "location" as const, value: "Dubai, United Arab Emirates" },
+      { type: "location" as const, value: "London, United Kingdom" },
+      { type: "location" as const, value: "Singapore" },
+      { type: "location" as const, value: "New York, USA" },
     ],
   },
 ];
 
 export const defaultFooterMeta = {
-  brand: "OWTC FZE",
+  brand: "ONE WORLD CAPITAL CLUB",
   description:
-    "Leading provider of strategic corporate services and investment management within the UAE free zone ecosystem.",
-  social: ["in", "x", "yt"],
-  copyright: "© 2024 One World Trade Centre FZE. All Rights Reserved.",
-  legal: ["Privacy Policy", "Terms of Service"],
+    "Premium investment and advisory firm dedicated to global development and innovative excellence.",
+  social: [
+    { icon: "globe", label: "Global", href: "/contact" },
+    { icon: "mail", label: "Email", href: "/contact" },
+    { icon: "phone", label: "Phone", href: "/contact" },
+  ],
+  copyright: "© 2024 ONE WORLD CAPITAL CLUB L.L.C FZE. ALL RIGHTS RESERVED.",
+  legal: [
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+  ],
 };

@@ -1,11 +1,17 @@
 "use client";
 
 import { useMemo } from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import SectionSaveFooter from "@/components/admin/SectionSaveFooter";
+import IconPicker from "./IconPicker";
 
-type SectionRow = { id: string; type: string; order: number; data: Record<string, unknown> };
+type SectionRow = {
+  id: string;
+  type: string;
+  order: number;
+  data: Record<string, unknown>;
+};
 
 type SectionFormProps = {
   section: SectionRow;
@@ -37,15 +43,28 @@ type IntroFormValues = {
 function toIntroDefaultValues(data: Record<string, unknown>): IntroFormValues {
   return {
     eyebrow: (data.eyebrow as string) ?? "",
-    titleLines: Array.isArray(data.title) ? (data.title as string[]).join("\n") : "",
+    titleLines: Array.isArray(data.title)
+      ? (data.title as string[]).join("\n")
+      : "",
     description: (data.description as string) ?? "",
-    highlightsLines: Array.isArray(data.highlights) ? (data.highlights as string[]).join("\n") : "",
+    highlightsLines: Array.isArray(data.highlights)
+      ? (data.highlights as string[]).join("\n")
+      : "",
     image: (data.image as string) ?? "",
   };
 }
 
-export function IntroSectionForm({ section, onSave, previewHref, saveMessage, saveMessageTone }: SectionFormProps) {
-  const defaultValues = useMemo(() => toIntroDefaultValues(section.data), [section.data]);
+export function IntroSectionForm({
+  section,
+  onSave,
+  previewHref,
+  saveMessage,
+  saveMessageTone,
+}: SectionFormProps) {
+  const defaultValues = useMemo(
+    () => toIntroDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     setValue,
@@ -75,19 +94,28 @@ export function IntroSectionForm({ section, onSave, previewHref, saveMessage, sa
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Eyebrow
         <input {...register("eyebrow", { required: "Eyebrow is required" })} />
-        {errors.eyebrow ? <p className="admin-field-error">{errors.eyebrow.message}</p> : null}
+        {errors.eyebrow ? (
+          <p className="admin-field-error">{errors.eyebrow.message}</p>
+        ) : null}
       </label>
 
       <label>
         Title lines (one per line)
-        <textarea rows={4} {...register("titleLines", { required: "Title is required" })} />
+        <textarea
+          rows={4}
+          {...register("titleLines", { required: "Title is required" })}
+        />
         {errors.titleLines ? (
           <p className="admin-field-error">{errors.titleLines.message}</p>
         ) : null}
@@ -95,7 +123,10 @@ export function IntroSectionForm({ section, onSave, previewHref, saveMessage, sa
 
       <label>
         Description
-        <textarea rows={4} {...register("description", { required: "Description is required" })} />
+        <textarea
+          rows={4}
+          {...register("description", { required: "Description is required" })}
+        />
         {errors.description ? (
           <p className="admin-field-error">{errors.description.message}</p>
         ) : null}
@@ -105,21 +136,30 @@ export function IntroSectionForm({ section, onSave, previewHref, saveMessage, sa
         Highlights (one per line)
         <textarea
           rows={4}
-          {...register("highlightsLines", { required: "At least one highlight is required" })}
+          {...register("highlightsLines", {
+            required: "At least one highlight is required",
+          })}
         />
         {errors.highlightsLines ? (
           <p className="admin-field-error">{errors.highlightsLines.message}</p>
         ) : null}
       </label>
 
-      <input type="hidden" {...register("image", { required: "Image path is required" })} />
+      <input
+        type="hidden"
+        {...register("image", { required: "Image path is required" })}
+      />
       <ImageUploadField
         label="Image URL"
         value={image}
-        onChange={(value) => setValue("image", value, { shouldDirty: true, shouldValidate: true })}
+        onChange={(value) =>
+          setValue("image", value, { shouldDirty: true, shouldValidate: true })
+        }
         folder={`sections/${section.type}`}
       />
-      {errors.image ? <p className="admin-field-error">{errors.image.message}</p> : null}
+      {errors.image ? (
+        <p className="admin-field-error">{errors.image.message}</p>
+      ) : null}
 
       <SectionSaveFooter
         isSubmitting={isSubmitting}
@@ -144,8 +184,12 @@ type ServicesFormValues = {
   cards: ServiceCardFormValue[];
 };
 
-function toServicesDefaultValues(data: Record<string, unknown>): ServicesFormValues {
-  const rawCards = Array.isArray(data.cards) ? (data.cards as Record<string, unknown>[]) : [];
+function toServicesDefaultValues(
+  data: Record<string, unknown>,
+): ServicesFormValues {
+  const rawCards = Array.isArray(data.cards)
+    ? (data.cards as Record<string, unknown>[])
+    : [];
 
   return {
     title: (data.title as string) ?? "",
@@ -169,7 +213,10 @@ export function ServicesSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toServicesDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toServicesDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
@@ -198,19 +245,28 @@ export function ServicesSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Title
         <input {...register("title", { required: "Title is required" })} />
-        {errors.title ? <p className="admin-field-error">{errors.title.message}</p> : null}
+        {errors.title ? (
+          <p className="admin-field-error">{errors.title.message}</p>
+        ) : null}
       </label>
 
       <label>
         Description
-        <textarea rows={4} {...register("description", { required: "Description is required" })} />
+        <textarea
+          rows={4}
+          {...register("description", { required: "Description is required" })}
+        />
         {errors.description ? (
           <p className="admin-field-error">{errors.description.message}</p>
         ) : null}
@@ -221,11 +277,20 @@ export function ServicesSectionForm({
         {fields.map((field, index) => (
           <div
             key={field.id}
-            style={{ marginBottom: 16, padding: 16, border: "1px solid #e2e8f0", borderRadius: 12 }}
+            style={{
+              marginBottom: 16,
+              padding: 16,
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+            }}
           >
             <label>
               Card title
-              <input {...register(`cards.${index}.title`, { required: "Card title is required" })} />
+              <input
+                {...register(`cards.${index}.title`, {
+                  required: "Card title is required",
+                })}
+              />
             </label>
             <label>
               Card description
@@ -238,7 +303,11 @@ export function ServicesSectionForm({
             </label>
             <label>
               Icon name
-              <input {...register(`cards.${index}.icon`, { required: "Icon is required" })} />
+              <input
+                {...register(`cards.${index}.icon`, {
+                  required: "Icon is required",
+                })}
+              />
             </label>
             <input type="hidden" {...register(`cards.${index}.iconImage`)} />
             <ImageUploadField
@@ -256,7 +325,11 @@ export function ServicesSectionForm({
             <p className="admin-muted" style={{ margin: 0 }}>
               Upload an icon image to override the icon name on the website.
             </p>
-            <button type="button" onClick={() => remove(index)} disabled={fields.length === 1}>
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              disabled={fields.length === 1}
+            >
               Remove card
             </button>
           </div>
@@ -264,7 +337,9 @@ export function ServicesSectionForm({
         <button
           type="button"
           className="admin-button-secondary"
-          onClick={() => append({ title: "", description: "", icon: "", iconImage: "" })}
+          onClick={() =>
+            append({ title: "", description: "", icon: "", iconImage: "" })
+          }
         >
           Add card
         </button>
@@ -281,28 +356,35 @@ export function ServicesSectionForm({
 }
 
 type WhyChooseItemFormValue = {
-  index: string;
   title: string;
+  icon: string;
   description: string;
 };
 
 type WhyChooseFormValues = {
+  title:string,
+  subheading:string;
   items: WhyChooseItemFormValue[];
 };
 
-function toWhyChooseDefaultValues(data: Record<string, unknown>): WhyChooseFormValues {
-  const rawItems = Array.isArray(data.items) ? (data.items as Record<string, unknown>[]) : [];
+function toWhyChooseDefaultValues(
+  data: Record<string, unknown>,
+): WhyChooseFormValues {
+  const rawItems = Array.isArray(data.items)
+    ? (data.items as Record<string, unknown>[])
+    : [];
 
   return {
+    title:(data.title as string)?? "",
+    subheading:(data.subheading as string) ?? "",
     items:
-      rawItems.length > 0
-        ? rawItems.map((item) => ({
-            index: (item.index as string) ?? "",
-            title: (item.title as string) ?? "",
-            description: (item.description as string) ?? "",
-          }))
-        : [{ index: "", title: "", description: "" }],
-  };
+     rawItems.length>0
+     ? rawItems.map((item)=>({
+     icon: typeof item.icon === "string" ? item.icon : "",
+      title:(item.title as string)??"",
+      description:(item.description as string)?? "",
+     })):[{icon:"",title:"",description:""}]
+  }
 }
 
 export function WhyChooseSectionForm({
@@ -312,7 +394,10 @@ export function WhyChooseSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toWhyChooseDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toWhyChooseDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
@@ -323,11 +408,9 @@ export function WhyChooseSectionForm({
 
   function handleValid(values: WhyChooseFormValues) {
     onSave({
-      items: values.items.map((item) => ({
-        index: item.index,
-        title: item.title,
-        description: item.description,
-      })),
+      title: values.title,
+      subheading: values.subheading,
+      items: values.items,
     });
   }
 
@@ -335,30 +418,70 @@ export function WhyChooseSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
+      <label>
+        Title
+        <input {...register("title", { required: true })} />
+      </label>
+      <label>
+        Subheading
+        <input {...register("subheading")} />
+      </label>
 
       <div>
         <h4>Items</h4>
         {fields.map((field, index) => (
           <div
             key={field.id}
-            style={{ marginBottom: 16, padding: 16, border: "1px solid #e2e8f0", borderRadius: 12 }}
+            style={{
+              marginBottom: 16,
+              padding: 16,
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+            }}
           >
             <label>
-              Index
-              <input {...register(`items.${index}.index`, { required: true })} placeholder="01" />
+              Icon
+              <Controller 
+              control={control}
+              name={`items.${index}.icon`}
+              defaultValue=""
+              rules={{required:true}}
+              render={({field})=>(
+                <IconPicker
+                  value={typeof field.value === "string" ? field.value : ""}
+                  onChange={(val) => field.onChange(typeof val === "string" ? val : "")}
+                />
+              )}
+              /> 
+              
             </label>
             <label>
               Title
-              <input {...register(`items.${index}.title`, { required: true })} />
+              <input  {...register(`items.${index}.title`, { required: true })}/>
             </label>
-            <label>
+            {/* <label>
+              Icon
+              <input
+                {...register(`items.${index}.icon`, { required: true })}
+                placeholder="star / rocket /etch"
+              />
+            </label> */}
+            {/* <label>
               Description
               <textarea rows={3} {...register(`items.${index}.description`, { required: true })} />
-            </label>
-            <button type="button" onClick={() => remove(index)} disabled={fields.length === 1}>
+            </label> */}
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              disabled={fields.length === 1}
+            >
               Remove item
             </button>
           </div>
@@ -366,7 +489,7 @@ export function WhyChooseSectionForm({
         <button
           type="button"
           className="admin-button-secondary"
-          onClick={() => append({ index: "", title: "", description: "" })}
+          onClick={() => append({ icon: "", title: "", description: "" })}
         >
           Add item
         </button>
@@ -382,43 +505,64 @@ export function WhyChooseSectionForm({
   );
 }
 
-type InvestmentStatFormValue = {
-  value: string;
-  label: string;
+type InvestmentItemFormValue = {
+  icon: string;
+  title: string;
+  description: string;
 };
 
 type InvestmentFormValues = {
   id: string;
-  title: string;
-  description: string;
-  stats: InvestmentStatFormValue[];
-  chartTitle: string;
-  chartDelta: string;
-  chartLabels: string;
-  chartValues: string;
+  headingLines: string;
+  items: InvestmentItemFormValue[];
+  quoteText: string;
+  quoteAuthor: string;
+  quoteRole: string;
 };
 
-function toInvestmentDefaultValues(data: Record<string, unknown>): InvestmentFormValues {
-  const rawStats = Array.isArray(data.stats) ? (data.stats as Record<string, unknown>[]) : [];
-  const rawChart = ((data.chart as Record<string, unknown>) ?? {}) as Record<string, unknown>;
-  const labels = Array.isArray(rawChart.labels) ? (rawChart.labels as string[]) : [];
-  const values = Array.isArray(rawChart.values) ? (rawChart.values as number[]) : [];
+function toInvestmentDefaultValues(
+  data: Record<string, unknown>,
+): InvestmentFormValues {
+  const rawItems = Array.isArray(data.items)
+    ? (data.items as Record<string, unknown>[])
+    : [];
+  const legacyStats = Array.isArray(data.stats)
+    ? (data.stats as Record<string, unknown>[])
+    : [];
+  const legacyDescription = (data.description as string) ?? "";
+
+  const items =
+    rawItems.length > 0
+      ? rawItems.map((item) => ({
+          icon: (item.icon as string) ?? "",
+          title: (item.title as string) ?? "",
+          description: (item.description as string) ?? "",
+        }))
+      : legacyStats.length > 0
+        ? legacyStats.map((stat) => ({
+            icon: "✓",
+            title: (stat.label as string) ?? "",
+            description: legacyDescription,
+          }))
+        : [
+            { icon: "✓", title: "Global Expertise", description: "" },
+            { icon: "✓", title: "Strategic Advisory", description: "" },
+            { icon: "✓", title: "Risk Management", description: "" },
+          ];
+
+  const headingLines = Array.isArray(data.heading)
+    ? (data.heading as string[])
+    : typeof data.title === "string"
+      ? [data.title]
+      : [];
 
   return {
     id: (data.id as string) ?? "",
-    title: (data.title as string) ?? "",
-    description: (data.description as string) ?? "",
-    stats:
-      rawStats.length > 0
-        ? rawStats.map((stat) => ({
-            value: (stat.value as string) ?? "",
-            label: (stat.label as string) ?? "",
-          }))
-        : [{ value: "", label: "" }],
-    chartTitle: (rawChart.title as string) ?? "",
-    chartDelta: (rawChart.delta as string) ?? "",
-    chartLabels: labels.join("\n"),
-    chartValues: values.map(String).join("\n"),
+    headingLines: headingLines.join("\n"),
+    items,
+    quoteText: (data.quoteText as string) ?? "",
+    quoteAuthor: (data.quoteAuthor as string) ?? "",
+    quoteRole: (data.quoteRole as string) ?? "",
   };
 }
 
@@ -429,39 +573,35 @@ export function InvestmentSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toInvestmentDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toInvestmentDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<InvestmentFormValues>({ defaultValues });
-  const { fields, append, remove } = useFieldArray({ control, name: "stats" });
+  const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
   function handleValid(values: InvestmentFormValues) {
-    const chartLabels = values.chartLabels
+    const heading = values.headingLines
       .split("\n")
       .map((line) => line.trim())
       .filter(Boolean);
-    const chartValues = values.chartValues
-      .split("\n")
-      .map((line) => Number(line.trim()))
-      .filter((value) => !Number.isNaN(value));
 
     onSave({
       id: values.id || undefined,
-      title: values.title,
-      description: values.description,
-      stats: values.stats.map((stat) => ({
-        value: stat.value,
-        label: stat.label,
+      heading,
+      items: values.items.map((item) => ({
+        icon: item.icon,
+        title: item.title,
+        description: item.description,
       })),
-      chart: {
-        title: values.chartTitle,
-        delta: values.chartDelta,
-        labels: chartLabels,
-        values: chartValues,
-      },
+      quoteText: values.quoteText,
+      quoteAuthor: values.quoteAuthor,
+      quoteRole: values.quoteRole,
     });
   }
 
@@ -469,7 +609,11 @@ export function InvestmentSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
@@ -479,35 +623,64 @@ export function InvestmentSectionForm({
       </label>
 
       <label>
-        Title
-        <input {...register("title", { required: "Title is required" })} />
-        {errors.title ? <p className="admin-field-error">{errors.title.message}</p> : null}
-      </label>
-
-      <label>
-        Description
-        <textarea rows={4} {...register("description", { required: "Description is required" })} />
-        {errors.description ? (
-          <p className="admin-field-error">{errors.description.message}</p>
+        Heading lines (one per line)
+        <textarea
+          rows={3}
+          {...register("headingLines", { required: "Heading is required" })}
+        />
+        {errors.headingLines ? (
+          <p className="admin-field-error">{errors.headingLines.message}</p>
         ) : null}
       </label>
 
       <div>
-        <h4>Stats</h4>
+        <h4>Feature items</h4>
         {fields.map((field, index) => (
           <div
             key={field.id}
-            style={{ marginBottom: 16, padding: 16, border: "1px solid #e2e8f0", borderRadius: 12 }}
+            style={{
+              marginBottom: 16,
+              padding: 16,
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+            }}
           >
-            <label>
-              Value
-              <input {...register(`stats.${index}.value`, { required: true })} placeholder="$500M+" />
+             <label>
+              Icon
+              <Controller 
+              control={control}
+              name={`items.${index}.icon`}
+              defaultValue=""
+              rules={{required:true}}
+              render={({field})=>(
+                <IconPicker
+                  value={typeof field.value === "string" ? field.value : ""}
+                  onChange={(val) => field.onChange(typeof val === "string" ? val : "")}
+                />
+              )}
+              /> 
+              
             </label>
             <label>
-              Label
-              <input {...register(`stats.${index}.label`, { required: true })} placeholder="Assets Under Advisory" />
+              Title
+              <input
+                {...register(`items.${index}.title`, { required: true })}
+                placeholder="Global Expertise"
+              />
             </label>
-            <button type="button" onClick={() => remove(index)} disabled={fields.length === 1}>
+            <label>
+              Description
+              <textarea
+                rows={3}
+                {...register(`items.${index}.description`, { required: true })}
+                placeholder="Navigating international markets with deep-rooted regulatory and cultural knowledge."
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              disabled={fields.length === 1}
+            >
               Remove stat
             </button>
           </div>
@@ -515,36 +688,40 @@ export function InvestmentSectionForm({
         <button
           type="button"
           className="admin-button-secondary"
-          onClick={() => append({ value: "", label: "" })}
+          onClick={() => append({ icon: "✓", title: "", description: "" })}
         >
-          Add stat
+          Add item
         </button>
       </div>
 
       <div>
-        <h4>Chart</h4>
+        <h4>Quote card</h4>
         <label>
-          Chart title
-          <input {...register("chartTitle", { required: "Chart title is required" })} />
-          {errors.chartTitle ? <p className="admin-field-error">{errors.chartTitle.message}</p> : null}
-        </label>
-        <label>
-          Delta
-          <input {...register("chartDelta", { required: "Chart delta is required" })} />
-          {errors.chartDelta ? <p className="admin-field-error">{errors.chartDelta.message}</p> : null}
-        </label>
-        <label>
-          Chart labels (one per line)
-          <textarea rows={4} {...register("chartLabels", { required: "Chart labels are required" })} />
-          {errors.chartLabels ? (
-            <p className="admin-field-error">{errors.chartLabels.message}</p>
+          Quote text
+          <textarea
+            rows={4}
+            {...register("quoteText", { required: "Quote text is required" })}
+          />
+          {errors.quoteText ? (
+            <p className="admin-field-error">{errors.quoteText.message}</p>
           ) : null}
         </label>
         <label>
-          Chart values (one number per line)
-          <textarea rows={4} {...register("chartValues", { required: "Chart values are required" })} />
-          {errors.chartValues ? (
-            <p className="admin-field-error">{errors.chartValues.message}</p>
+          Quote author
+          <input
+            {...register("quoteAuthor", { required: "Quote author is required" })}
+          />
+          {errors.quoteAuthor ? (
+            <p className="admin-field-error">{errors.quoteAuthor.message}</p>
+          ) : null}
+        </label>
+        <label>
+          Quote role
+          <input
+            {...register("quoteRole", { required: "Quote role is required" })}
+          />
+          {errors.quoteRole ? (
+            <p className="admin-field-error">{errors.quoteRole.message}</p>
           ) : null}
         </label>
       </div>
@@ -560,14 +737,29 @@ export function InvestmentSectionForm({
 }
 
 type ClientLogosFormValues = {
-  heading: string;
-  logosLines: string;
+  title: string;
+  subtitle: string;
+  actionLabel: string;
+  actionHref: string;
 };
 
-function toClientLogosDefaultValues(data: Record<string, unknown>): ClientLogosFormValues {
+function toClientLogosDefaultValues(
+  data: Record<string, unknown>,
+): ClientLogosFormValues {
+  const action = ((data.action as Record<string, unknown>) ?? {}) as Record<
+    string,
+    unknown
+  >;
+
   return {
-    heading: (data.heading as string) ?? "",
-    logosLines: Array.isArray(data.logos) ? (data.logos as string[]).join("\n") : "",
+    title:
+      (data.title as string) ??
+      ((data.heading as string) || "Ready to scale your vision?"),
+    subtitle:
+      (data.subtitle as string) ??
+      "Connect with our strategic advisors for a confidential consultation.",
+    actionLabel: (action.label as string) ?? "PARTNER WITH US",
+    actionHref: (action.href as string) ?? "/contact",
   };
 }
 
@@ -578,20 +770,24 @@ export function ClientLogosSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toClientLogosDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toClientLogosDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { errors, isSubmitting },
   } = useForm<ClientLogosFormValues>({ defaultValues });
 
   function handleValid(values: ClientLogosFormValues) {
     onSave({
-      heading: values.heading || undefined,
-      logos: values.logosLines
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
+      title: values.title,
+      subtitle: values.subtitle,
+      action: {
+        label: values.actionLabel,
+        href: values.actionHref,
+      },
     });
   }
 
@@ -599,19 +795,62 @@ export function ClientLogosSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
-        Heading
-        <input {...register("heading")} placeholder="Trusted partners" />
+        Title
+        <input
+          {...register("title", { required: "Title is required" })}
+          placeholder="Ready to scale your vision?"
+        />
+        {errors.title ? (
+          <p className="admin-field-error">{errors.title.message}</p>
+        ) : null}
       </label>
 
       <label>
-        Logos (one per line)
-        <textarea rows={5} {...register("logosLines", { required: true })} />
+        Subtitle
+        <textarea
+          rows={3}
+          {...register("subtitle", { required: "Subtitle is required" })}
+          placeholder="Connect with our strategic advisors for a confidential consultation."
+        />
+        {errors.subtitle ? (
+          <p className="admin-field-error">{errors.subtitle.message}</p>
+        ) : null}
       </label>
+
+      <div>
+        <h4>Action</h4>
+        <label>
+          Label
+          <input
+            {...register("actionLabel", {
+              required: "Action label is required",
+            })}
+            placeholder="PARTNER WITH US"
+          />
+          {errors.actionLabel ? (
+            <p className="admin-field-error">{errors.actionLabel.message}</p>
+          ) : null}
+        </label>
+        <label>
+          Href
+          <input
+            {...register("actionHref", { required: "Action href is required" })}
+            placeholder="/contact"
+          />
+          {errors.actionHref ? (
+            <p className="admin-field-error">{errors.actionHref.message}</p>
+          ) : null}
+        </label>
+      </div>
 
       <SectionSaveFooter
         isSubmitting={isSubmitting}
@@ -631,7 +870,10 @@ type CtaFormValues = {
 };
 
 function toCtaDefaultValues(data: Record<string, unknown>): CtaFormValues {
-  const action = ((data.action as Record<string, unknown>) ?? {}) as Record<string, unknown>;
+  const action = ((data.action as Record<string, unknown>) ?? {}) as Record<
+    string,
+    unknown
+  >;
 
   return {
     title: (data.title as string) ?? "",
@@ -641,8 +883,17 @@ function toCtaDefaultValues(data: Record<string, unknown>): CtaFormValues {
   };
 }
 
-export function CtaSectionForm({ section, onSave, previewHref, saveMessage, saveMessageTone }: SectionFormProps) {
-  const defaultValues = useMemo(() => toCtaDefaultValues(section.data), [section.data]);
+export function CtaSectionForm({
+  section,
+  onSave,
+  previewHref,
+  saveMessage,
+  saveMessageTone,
+}: SectionFormProps) {
+  const defaultValues = useMemo(
+    () => toCtaDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     handleSubmit,
@@ -664,19 +915,31 @@ export function CtaSectionForm({ section, onSave, previewHref, saveMessage, save
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Title
-        <textarea rows={3} {...register("title", { required: "Title is required" })} />
-        {errors.title ? <p className="admin-field-error">{errors.title.message}</p> : null}
+        <textarea
+          rows={3}
+          {...register("title", { required: "Title is required" })}
+        />
+        {errors.title ? (
+          <p className="admin-field-error">{errors.title.message}</p>
+        ) : null}
       </label>
 
       <label>
         Description
-        <textarea rows={4} {...register("description", { required: "Description is required" })} />
+        <textarea
+          rows={4}
+          {...register("description", { required: "Description is required" })}
+        />
         {errors.description ? (
           <p className="admin-field-error">{errors.description.message}</p>
         ) : null}
@@ -686,14 +949,20 @@ export function CtaSectionForm({ section, onSave, previewHref, saveMessage, save
         <h4>Action</h4>
         <label>
           Label
-          <input {...register("actionLabel", { required: "Action label is required" })} />
+          <input
+            {...register("actionLabel", {
+              required: "Action label is required",
+            })}
+          />
           {errors.actionLabel ? (
             <p className="admin-field-error">{errors.actionLabel.message}</p>
           ) : null}
         </label>
         <label>
           Href
-          <input {...register("actionHref", { required: "Action href is required" })} />
+          <input
+            {...register("actionHref", { required: "Action href is required" })}
+          />
           {errors.actionHref ? (
             <p className="admin-field-error">{errors.actionHref.message}</p>
           ) : null}
@@ -715,7 +984,9 @@ type ContactFormValues = {
   subtext: string;
 };
 
-function toContactDefaultValues(data: Record<string, unknown>): ContactFormValues {
+function toContactDefaultValues(
+  data: Record<string, unknown>,
+): ContactFormValues {
   return {
     headline: (data.headline as string) ?? "",
     subtext: (data.subtext as string) ?? "",
@@ -729,7 +1000,10 @@ export function ContactSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toContactDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toContactDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     handleSubmit,
@@ -747,20 +1021,33 @@ export function ContactSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Headline
-        <input {...register("headline", { required: "Headline is required" })} />
-        {errors.headline ? <p className="admin-field-error">{errors.headline.message}</p> : null}
+        <input
+          {...register("headline", { required: "Headline is required" })}
+        />
+        {errors.headline ? (
+          <p className="admin-field-error">{errors.headline.message}</p>
+        ) : null}
       </label>
 
       <label>
         Subtext
-        <textarea rows={4} {...register("subtext", { required: "Subtext is required" })} />
-        {errors.subtext ? <p className="admin-field-error">{errors.subtext.message}</p> : null}
+        <textarea
+          rows={4}
+          {...register("subtext", { required: "Subtext is required" })}
+        />
+        {errors.subtext ? (
+          <p className="admin-field-error">{errors.subtext.message}</p>
+        ) : null}
       </label>
 
       <SectionSaveFooter
@@ -780,9 +1067,13 @@ type ContactHeroFormValues = {
   backgroundImage: string;
 };
 
-function toContactHeroDefaultValues(data: Record<string, unknown>): ContactHeroFormValues {
+function toContactHeroDefaultValues(
+  data: Record<string, unknown>,
+): ContactHeroFormValues {
   return {
-    titleLines: Array.isArray(data.title) ? (data.title as string[]).join("\n") : "",
+    titleLines: Array.isArray(data.title)
+      ? (data.title as string[]).join("\n")
+      : "",
     description: (data.description as string) ?? "",
     stat: (data.stat as string) ?? "",
     backgroundImage: (data.backgroundImage as string) ?? "",
@@ -796,7 +1087,10 @@ export function ContactHeroSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toContactHeroDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toContactHeroDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
@@ -822,37 +1116,58 @@ export function ContactHeroSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Title lines (one per line)
-        <textarea rows={4} {...register("titleLines", { required: "Title is required" })} />
-        {errors.titleLines ? <p className="admin-field-error">{errors.titleLines.message}</p> : null}
+        <textarea
+          rows={4}
+          {...register("titleLines", { required: "Title is required" })}
+        />
+        {errors.titleLines ? (
+          <p className="admin-field-error">{errors.titleLines.message}</p>
+        ) : null}
       </label>
 
       <label>
         Description
-        <textarea rows={4} {...register("description", { required: "Description is required" })} />
-        {errors.description ? <p className="admin-field-error">{errors.description.message}</p> : null}
+        <textarea
+          rows={4}
+          {...register("description", { required: "Description is required" })}
+        />
+        {errors.description ? (
+          <p className="admin-field-error">{errors.description.message}</p>
+        ) : null}
       </label>
 
       <label>
         Supporting stat
         <input {...register("stat", { required: "Stat is required" })} />
-        {errors.stat ? <p className="admin-field-error">{errors.stat.message}</p> : null}
+        {errors.stat ? (
+          <p className="admin-field-error">{errors.stat.message}</p>
+        ) : null}
       </label>
 
       <input
         type="hidden"
-        {...register("backgroundImage", { required: "Background image is required" })}
+        {...register("backgroundImage", {
+          required: "Background image is required",
+        })}
       />
       <ImageUploadField
         label="Background image URL"
         value={backgroundImage}
         onChange={(value) =>
-          setValue("backgroundImage", value, { shouldDirty: true, shouldValidate: true })
+          setValue("backgroundImage", value, {
+            shouldDirty: true,
+            shouldValidate: true,
+          })
         }
         folder={`sections/${section.type}`}
       />
@@ -888,20 +1203,28 @@ type ContactInquiryFormValues = {
   mapLabelSubtitle: string;
 };
 
-function toContactInquiryDefaultValues(data: Record<string, unknown>): ContactInquiryFormValues {
-  const rawItems = Array.isArray(data.officeItems) ? (data.officeItems as Record<string, unknown>[]) : [];
+function toContactInquiryDefaultValues(
+  data: Record<string, unknown>,
+): ContactInquiryFormValues {
+  const rawItems = Array.isArray(data.officeItems)
+    ? (data.officeItems as Record<string, unknown>[])
+    : [];
 
   return {
     formTitle: (data.formTitle as string) ?? "",
     formDescription: (data.formDescription as string) ?? "",
     submitLabel: (data.submitLabel as string) ?? "",
-    inquiryOptionsText: Array.isArray(data.inquiryOptions) ? (data.inquiryOptions as string[]).join("\n") : "",
+    inquiryOptionsText: Array.isArray(data.inquiryOptions)
+      ? (data.inquiryOptions as string[]).join("\n")
+      : "",
     officeHeading: (data.officeHeading as string) ?? "",
     officeItems:
       rawItems.length > 0
         ? rawItems.map((item) => ({
             title: (item.title as string) ?? "",
-            linesText: Array.isArray(item.lines) ? (item.lines as string[]).join("\n") : "",
+            linesText: Array.isArray(item.lines)
+              ? (item.lines as string[]).join("\n")
+              : "",
             icon: (item.icon as string) ?? "",
           }))
         : [{ title: "", linesText: "", icon: "location" }],
@@ -918,7 +1241,10 @@ export function ContactInquirySectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toContactInquiryDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toContactInquiryDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
@@ -926,7 +1252,10 @@ export function ContactInquirySectionForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ContactInquiryFormValues>({ defaultValues });
-  const { fields, append, remove } = useFieldArray({ control, name: "officeItems" });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "officeItems",
+  });
   const mapImage = useWatch({ control, name: "mapImage" });
 
   function handleValid(values: ContactInquiryFormValues) {
@@ -957,40 +1286,70 @@ export function ContactInquirySectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Form title
-        <input {...register("formTitle", { required: "Form title is required" })} />
-        {errors.formTitle ? <p className="admin-field-error">{errors.formTitle.message}</p> : null}
+        <input
+          {...register("formTitle", { required: "Form title is required" })}
+        />
+        {errors.formTitle ? (
+          <p className="admin-field-error">{errors.formTitle.message}</p>
+        ) : null}
       </label>
 
       <label>
         Form description
-        <textarea rows={3} {...register("formDescription", { required: "Description is required" })} />
-        {errors.formDescription ? <p className="admin-field-error">{errors.formDescription.message}</p> : null}
+        <textarea
+          rows={3}
+          {...register("formDescription", {
+            required: "Description is required",
+          })}
+        />
+        {errors.formDescription ? (
+          <p className="admin-field-error">{errors.formDescription.message}</p>
+        ) : null}
       </label>
 
       <label>
         Submit label
-        <input {...register("submitLabel", { required: "Submit label is required" })} />
-        {errors.submitLabel ? <p className="admin-field-error">{errors.submitLabel.message}</p> : null}
+        <input
+          {...register("submitLabel", { required: "Submit label is required" })}
+        />
+        {errors.submitLabel ? (
+          <p className="admin-field-error">{errors.submitLabel.message}</p>
+        ) : null}
       </label>
 
       <label>
         Inquiry options (one per line)
-        <textarea rows={5} {...register("inquiryOptionsText", { required: "At least one option is required" })} />
+        <textarea
+          rows={5}
+          {...register("inquiryOptionsText", {
+            required: "At least one option is required",
+          })}
+        />
         {errors.inquiryOptionsText ? (
-          <p className="admin-field-error">{errors.inquiryOptionsText.message}</p>
+          <p className="admin-field-error">
+            {errors.inquiryOptionsText.message}
+          </p>
         ) : null}
       </label>
 
       <label>
         Office section heading
-        <input {...register("officeHeading", { required: "Heading is required" })} />
-        {errors.officeHeading ? <p className="admin-field-error">{errors.officeHeading.message}</p> : null}
+        <input
+          {...register("officeHeading", { required: "Heading is required" })}
+        />
+        {errors.officeHeading ? (
+          <p className="admin-field-error">{errors.officeHeading.message}</p>
+        ) : null}
       </label>
 
       <div>
@@ -998,21 +1357,40 @@ export function ContactInquirySectionForm({
         {fields.map((field, index) => (
           <div
             key={field.id}
-            style={{ marginBottom: 16, padding: 16, border: "1px solid #e2e8f0", borderRadius: 12 }}
+            style={{
+              marginBottom: 16,
+              padding: 16,
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+            }}
           >
             <label>
               Title
-              <input {...register(`officeItems.${index}.title`, { required: true })} />
+              <input
+                {...register(`officeItems.${index}.title`, { required: true })}
+              />
             </label>
             <label>
               Lines (one per line)
-              <textarea rows={4} {...register(`officeItems.${index}.linesText`, { required: true })} />
+              <textarea
+                rows={4}
+                {...register(`officeItems.${index}.linesText`, {
+                  required: true,
+                })}
+              />
             </label>
             <label>
               Icon name
-              <input {...register(`officeItems.${index}.icon`, { required: true })} placeholder="location" />
+              <input
+                {...register(`officeItems.${index}.icon`, { required: true })}
+                placeholder="location"
+              />
             </label>
-            <button type="button" onClick={() => remove(index)} disabled={fields.length === 1}>
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              disabled={fields.length === 1}
+            >
               Remove item
             </button>
           </div>
@@ -1026,24 +1404,44 @@ export function ContactInquirySectionForm({
         </button>
       </div>
 
-      <input type="hidden" {...register("mapImage", { required: "Map image is required" })} />
+      <input
+        type="hidden"
+        {...register("mapImage", { required: "Map image is required" })}
+      />
       <ImageUploadField
         label="Map image URL"
         value={mapImage}
-        onChange={(value) => setValue("mapImage", value, { shouldDirty: true, shouldValidate: true })}
+        onChange={(value) =>
+          setValue("mapImage", value, {
+            shouldDirty: true,
+            shouldValidate: true,
+          })
+        }
         folder={`sections/${section.type}`}
       />
-      {errors.mapImage ? <p className="admin-field-error">{errors.mapImage.message}</p> : null}
+      {errors.mapImage ? (
+        <p className="admin-field-error">{errors.mapImage.message}</p>
+      ) : null}
 
       <label>
         Map label title
-        <input {...register("mapLabelTitle", { required: "Map label title is required" })} />
-        {errors.mapLabelTitle ? <p className="admin-field-error">{errors.mapLabelTitle.message}</p> : null}
+        <input
+          {...register("mapLabelTitle", {
+            required: "Map label title is required",
+          })}
+        />
+        {errors.mapLabelTitle ? (
+          <p className="admin-field-error">{errors.mapLabelTitle.message}</p>
+        ) : null}
       </label>
 
       <label>
         Map label subtitle
-        <input {...register("mapLabelSubtitle", { required: "Map label subtitle is required" })} />
+        <input
+          {...register("mapLabelSubtitle", {
+            required: "Map label subtitle is required",
+          })}
+        />
         {errors.mapLabelSubtitle ? (
           <p className="admin-field-error">{errors.mapLabelSubtitle.message}</p>
         ) : null}
@@ -1065,7 +1463,9 @@ type AboutHeroFormValues = {
   backgroundImage: string;
 };
 
-function toAboutHeroDefaultValues(data: Record<string, unknown>): AboutHeroFormValues {
+function toAboutHeroDefaultValues(
+  data: Record<string, unknown>,
+): AboutHeroFormValues {
   return {
     title: (data.title as string) ?? "",
     description: (data.description as string) ?? "",
@@ -1080,7 +1480,10 @@ export function AboutHeroSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toAboutHeroDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toAboutHeroDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
@@ -1102,31 +1505,47 @@ export function AboutHeroSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Title
         <input {...register("title", { required: "Title is required" })} />
-        {errors.title ? <p className="admin-field-error">{errors.title.message}</p> : null}
+        {errors.title ? (
+          <p className="admin-field-error">{errors.title.message}</p>
+        ) : null}
       </label>
 
       <label>
         Description
-        <textarea rows={4} {...register("description", { required: "Description is required" })} />
-        {errors.description ? <p className="admin-field-error">{errors.description.message}</p> : null}
+        <textarea
+          rows={4}
+          {...register("description", { required: "Description is required" })}
+        />
+        {errors.description ? (
+          <p className="admin-field-error">{errors.description.message}</p>
+        ) : null}
       </label>
 
       <input
         type="hidden"
-        {...register("backgroundImage", { required: "Background image is required" })}
+        {...register("backgroundImage", {
+          required: "Background image is required",
+        })}
       />
       <ImageUploadField
         label="Background image URL"
         value={backgroundImage}
         onChange={(value) =>
-          setValue("backgroundImage", value, { shouldDirty: true, shouldValidate: true })
+          setValue("backgroundImage", value, {
+            shouldDirty: true,
+            shouldValidate: true,
+          })
         }
         folder={`sections/${section.type}`}
       />
@@ -1159,7 +1578,9 @@ type AboutVisionMissionFormValues = {
 function toAboutVisionMissionDefaultValues(
   data: Record<string, unknown>,
 ): AboutVisionMissionFormValues {
-  const rawCards = Array.isArray(data.cards) ? (data.cards as Record<string, unknown>[]) : [];
+  const rawCards = Array.isArray(data.cards)
+    ? (data.cards as Record<string, unknown>[])
+    : [];
 
   return {
     cards:
@@ -1171,7 +1592,15 @@ function toAboutVisionMissionDefaultValues(
             iconImage: (card.iconImage as string) ?? "",
             accentColor: (card.accentColor as string) ?? "#0b3d91",
           }))
-        : [{ title: "", description: "", icon: "", iconImage: "", accentColor: "#0b3d91" }],
+        : [
+            {
+              title: "",
+              description: "",
+              icon: "",
+              iconImage: "",
+              accentColor: "#0b3d91",
+            },
+          ],
   };
 }
 
@@ -1182,7 +1611,10 @@ export function AboutVisionMissionSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toAboutVisionMissionDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toAboutVisionMissionDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
@@ -1209,7 +1641,11 @@ export function AboutVisionMissionSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
@@ -1218,19 +1654,32 @@ export function AboutVisionMissionSectionForm({
         {fields.map((field, index) => (
           <div
             key={field.id}
-            style={{ marginBottom: 16, padding: 16, border: "1px solid #e2e8f0", borderRadius: 12 }}
+            style={{
+              marginBottom: 16,
+              padding: 16,
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+            }}
           >
             <label>
               Title
-              <input {...register(`cards.${index}.title`, { required: true })} />
+              <input
+                {...register(`cards.${index}.title`, { required: true })}
+              />
             </label>
             <label>
               Description
-              <textarea rows={4} {...register(`cards.${index}.description`, { required: true })} />
+              <textarea
+                rows={4}
+                {...register(`cards.${index}.description`, { required: true })}
+              />
             </label>
             <label>
               Icon name
-              <input {...register(`cards.${index}.icon`)} placeholder="vision" />
+              <input
+                {...register(`cards.${index}.icon`)}
+                placeholder="vision"
+              />
             </label>
             <input type="hidden" {...register(`cards.${index}.iconImage`)} />
             <ImageUploadField
@@ -1246,9 +1695,16 @@ export function AboutVisionMissionSectionForm({
             />
             <label>
               Accent color
-              <input {...register(`cards.${index}.accentColor`, { required: true })} placeholder="#0b3d91" />
+              <input
+                {...register(`cards.${index}.accentColor`, { required: true })}
+                placeholder="#0b3d91"
+              />
             </label>
-            <button type="button" onClick={() => remove(index)} disabled={fields.length === 1}>
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              disabled={fields.length === 1}
+            >
               Remove card
             </button>
           </div>
@@ -1257,7 +1713,13 @@ export function AboutVisionMissionSectionForm({
           type="button"
           className="admin-button-secondary"
           onClick={() =>
-            append({ title: "", description: "", icon: "", iconImage: "", accentColor: "#0b3d91" })
+            append({
+              title: "",
+              description: "",
+              icon: "",
+              iconImage: "",
+              accentColor: "#0b3d91",
+            })
           }
         >
           Add card
@@ -1282,12 +1744,18 @@ type AboutAdvantageFormValues = {
   image: string;
 };
 
-function toAboutAdvantageDefaultValues(data: Record<string, unknown>): AboutAdvantageFormValues {
+function toAboutAdvantageDefaultValues(
+  data: Record<string, unknown>,
+): AboutAdvantageFormValues {
   return {
     eyebrow: (data.eyebrow as string) ?? "",
-    titleLines: Array.isArray(data.title) ? (data.title as string[]).join("\n") : "",
+    titleLines: Array.isArray(data.title)
+      ? (data.title as string[]).join("\n")
+      : "",
     description: (data.description as string) ?? "",
-    pointsLines: Array.isArray(data.points) ? (data.points as string[]).join("\n") : "",
+    pointsLines: Array.isArray(data.points)
+      ? (data.points as string[]).join("\n")
+      : "",
     image: (data.image as string) ?? "",
   };
 }
@@ -1299,7 +1767,10 @@ export function AboutAdvantageSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toAboutAdvantageDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toAboutAdvantageDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
@@ -1329,42 +1800,72 @@ export function AboutAdvantageSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Eyebrow
         <input {...register("eyebrow", { required: "Eyebrow is required" })} />
-        {errors.eyebrow ? <p className="admin-field-error">{errors.eyebrow.message}</p> : null}
+        {errors.eyebrow ? (
+          <p className="admin-field-error">{errors.eyebrow.message}</p>
+        ) : null}
       </label>
 
       <label>
         Title lines (one per line)
-        <textarea rows={4} {...register("titleLines", { required: "Title is required" })} />
-        {errors.titleLines ? <p className="admin-field-error">{errors.titleLines.message}</p> : null}
+        <textarea
+          rows={4}
+          {...register("titleLines", { required: "Title is required" })}
+        />
+        {errors.titleLines ? (
+          <p className="admin-field-error">{errors.titleLines.message}</p>
+        ) : null}
       </label>
 
       <label>
         Description
-        <textarea rows={4} {...register("description", { required: "Description is required" })} />
-        {errors.description ? <p className="admin-field-error">{errors.description.message}</p> : null}
+        <textarea
+          rows={4}
+          {...register("description", { required: "Description is required" })}
+        />
+        {errors.description ? (
+          <p className="admin-field-error">{errors.description.message}</p>
+        ) : null}
       </label>
 
       <label>
         Bullet points (one per line)
-        <textarea rows={4} {...register("pointsLines", { required: "At least one point is required" })} />
-        {errors.pointsLines ? <p className="admin-field-error">{errors.pointsLines.message}</p> : null}
+        <textarea
+          rows={4}
+          {...register("pointsLines", {
+            required: "At least one point is required",
+          })}
+        />
+        {errors.pointsLines ? (
+          <p className="admin-field-error">{errors.pointsLines.message}</p>
+        ) : null}
       </label>
 
-      <input type="hidden" {...register("image", { required: "Image is required" })} />
+      <input
+        type="hidden"
+        {...register("image", { required: "Image is required" })}
+      />
       <ImageUploadField
         label="Image URL"
         value={image}
-        onChange={(value) => setValue("image", value, { shouldDirty: true, shouldValidate: true })}
+        onChange={(value) =>
+          setValue("image", value, { shouldDirty: true, shouldValidate: true })
+        }
         folder={`sections/${section.type}`}
       />
-      {errors.image ? <p className="admin-field-error">{errors.image.message}</p> : null}
+      {errors.image ? (
+        <p className="admin-field-error">{errors.image.message}</p>
+      ) : null}
 
       <SectionSaveFooter
         isSubmitting={isSubmitting}
@@ -1388,8 +1889,12 @@ type AboutValuesFormValues = {
   items: AboutValueItemFormValue[];
 };
 
-function toAboutValuesDefaultValues(data: Record<string, unknown>): AboutValuesFormValues {
-  const rawItems = Array.isArray(data.items) ? (data.items as Record<string, unknown>[]) : [];
+function toAboutValuesDefaultValues(
+  data: Record<string, unknown>,
+): AboutValuesFormValues {
+  const rawItems = Array.isArray(data.items)
+    ? (data.items as Record<string, unknown>[])
+    : [];
 
   return {
     title: (data.title as string) ?? "",
@@ -1412,7 +1917,10 @@ export function AboutValuesSectionForm({
   saveMessage,
   saveMessageTone,
 }: SectionFormProps) {
-  const defaultValues = useMemo(() => toAboutValuesDefaultValues(section.data), [section.data]);
+  const defaultValues = useMemo(
+    () => toAboutValuesDefaultValues(section.data),
+    [section.data],
+  );
   const {
     register,
     control,
@@ -1439,14 +1947,20 @@ export function AboutValuesSectionForm({
     <form
       className="admin-form"
       onSubmit={handleSubmit(handleValid)}
-      style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e2e8f0" }}
+      style={{
+        marginBottom: 24,
+        paddingBottom: 24,
+        borderBottom: "1px solid #e2e8f0",
+      }}
     >
       <SectionHeading section={section} />
 
       <label>
         Title
         <input {...register("title", { required: "Title is required" })} />
-        {errors.title ? <p className="admin-field-error">{errors.title.message}</p> : null}
+        {errors.title ? (
+          <p className="admin-field-error">{errors.title.message}</p>
+        ) : null}
       </label>
 
       <div>
@@ -1454,19 +1968,32 @@ export function AboutValuesSectionForm({
         {fields.map((field, index) => (
           <div
             key={field.id}
-            style={{ marginBottom: 16, padding: 16, border: "1px solid #e2e8f0", borderRadius: 12 }}
+            style={{
+              marginBottom: 16,
+              padding: 16,
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+            }}
           >
             <label>
               Title
-              <input {...register(`items.${index}.title`, { required: true })} />
+              <input
+                {...register(`items.${index}.title`, { required: true })}
+              />
             </label>
             <label>
               Description
-              <textarea rows={3} {...register(`items.${index}.description`, { required: true })} />
+              <textarea
+                rows={3}
+                {...register(`items.${index}.description`, { required: true })}
+              />
             </label>
             <label>
               Icon name
-              <input {...register(`items.${index}.icon`)} placeholder="professionalism" />
+              <input
+                {...register(`items.${index}.icon`)}
+                placeholder="professionalism"
+              />
             </label>
             <input type="hidden" {...register(`items.${index}.iconImage`)} />
             <ImageUploadField
@@ -1480,7 +2007,11 @@ export function AboutValuesSectionForm({
               }
               folder={`sections/${section.type}/icons`}
             />
-            <button type="button" onClick={() => remove(index)} disabled={fields.length === 1}>
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              disabled={fields.length === 1}
+            >
               Remove value
             </button>
           </div>
@@ -1488,7 +2019,9 @@ export function AboutValuesSectionForm({
         <button
           type="button"
           className="admin-button-secondary"
-          onClick={() => append({ title: "", description: "", icon: "", iconImage: "" })}
+          onClick={() =>
+            append({ title: "", description: "", icon: "", iconImage: "" })
+          }
         >
           Add value
         </button>

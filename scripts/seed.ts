@@ -101,50 +101,76 @@ const servicesData = {
 };
 
 const whyChooseData = {
+  title: "Industries We Invest In",
+  subheading: "Diversified portfolio across high-growth sectors",
   items: [
     {
-      index: "01",
-      title: "UAE Licensing",
-      description: "Rapid business incorporation with full regulatory support in prime zones.",
+      icon: "⚙️",
+      title: "TECHNOLOGY",
     },
     {
-      index: "02",
-      title: "Global Network",
-      description: "Connected to key financial hubs across Europe, Asia, and the Americas.",
+      icon: "⚡",
+      title: "ENERGY",
     },
     {
-      index: "03",
-      title: "Investment Alpha",
-      description: "Proprietary analysis driving high-yield opportunities in emerging markets.",
+      icon: "🏥",
+      title: "HEALTHCARE",
     },
     {
-      index: "04",
-      title: "Digital Focus",
-      description: "Technology-first approach to all our corporate and trading operations.",
+      icon: "🎓",
+      title: "EDUCATION",
+    },
+    {
+      icon: "🌴",
+      title: "TOURISM",
+    },
+    {
+      icon: "🏢",
+      title: "COMMERCIAL",
+    },
+    {
+      icon: "🌾",
+      title: "AGRICULTURE",
     },
   ],
 };
 
 const investmentData = {
-  id: "about",
-  title: "Focus on Tech, Agri, and Venture Capital",
-  description:
-    "We actively invest in the foundational industries of tomorrow. From sustainable agriculture technology to disruptive SaaS ventures, our capital is deployed where it can create maximum global impact.",
-  stats: [
-    { value: "$500M+", label: "Assets Under Advisory" },
-    { value: "15+", label: "Global Markets" },
+  id: "investment",
+  heading: ["Why Partners Choose", "One World Capital"],
+  items: [
+    {
+      icon: "✓",
+      title: "Global Expertise",
+      description:
+        "Navigating international markets with deep-rooted regulatory and cultural knowledge.",
+    },
+    {
+      icon: "✓",
+      title: "Strategic Advisory",
+      description:
+        "Outcome-focused guidance that prioritizes sustainable growth and long-term value.",
+    },
+    {
+      icon: "✓",
+      title: "Risk Management",
+      description:
+        "Rigorous due diligence and proprietary risk assessment frameworks for every venture.",
+    },
   ],
-  chart: {
-    title: "Portfolio Performance Index",
-    delta: "+16.8%",
-    labels: ["2020", "2021", "2022", "2023", "2024", "2025"],
-    values: [42, 64, 84, 100, 74, 98],
-  },
+  quoteText:
+    '"One World Capital provides the vision and the vehicle for international expansion that few others can match."',
+  quoteAuthor: "Strategic Portfolio Insight",
+  quoteRole: "Global Division",
 };
 
 const clientLogosData = {
-  heading: "Trusted by global alliances",
-  logos: ["GLOBAL FIN", "TRADEX", "EMIRATES CORP", "CAPITAL X", "VERIFY"],
+  title: "Ready to scale your vision?",
+  subtitle: "Connect with our strategic advisors for a confidential consultation.",
+  action: {
+    label: "PARTNER WITH US",
+    href: "/contact",
+  },
 };
 
 const ctaData = {

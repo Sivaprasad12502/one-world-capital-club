@@ -1,47 +1,88 @@
 import type { z } from "zod";
 import type { investmentDataSchema } from "@/schemas/sections";
+import * as Icons from "lucide-react"
 
 type InvestmentContent = z.infer<typeof investmentDataSchema>;
 
 export default function InvestmentSection({ content }: { content: InvestmentContent }) {
-  const sectionId = content.id ?? "investment";
+  const legacyContent = content as unknown as Record<string, unknown>;
+  const sectionId =
+    typeof legacyContent.id === "string" && legacyContent.id.length > 0
+      ? legacyContent.id
+      : "investment";
+
+  const heading = Array.isArray(legacyContent.heading)
+    ? (legacyContent.heading as string[]).filter((line) => typeof line === "string" && line)
+    : typeof legacyContent.title === "string" && legacyContent.title
+      ? [legacyContent.title]
+      : ["Why Partners Choose", "One World Capital"];
+
+  const legacyDescription =
+    typeof legacyContent.description === "string" ? legacyContent.description : "";
+  const items = Array.isArray(legacyContent.items)
+    ? (legacyContent.items as Array<Record<string, unknown>>).map((item) => ({
+        icon: typeof item.icon === "string" ? item.icon : "✓",
+        title: typeof item.title === "string" ? item.title : "",
+        description: typeof item.description === "string" ? item.description : "",
+      }))
+    : Array.isArray(legacyContent.stats)
+      ? (legacyContent.stats as Array<Record<string, unknown>>).map((stat) => ({
+          icon: "✓",
+          title: typeof stat.label === "string" ? stat.label : "",
+          description: legacyDescription,
+        }))
+      : [];
+
+  const quoteText =
+    typeof legacyContent.quoteText === "string" && legacyContent.quoteText
+      ? legacyContent.quoteText
+      : '"One World Capital provides the vision and the vehicle for international expansion that few others can match."';
+  const quoteAuthor =
+    typeof legacyContent.quoteAuthor === "string" && legacyContent.quoteAuthor
+      ? legacyContent.quoteAuthor
+      : "Strategic Portfolio Insight";
+  const quoteRole =
+    typeof legacyContent.quoteRole === "string" && legacyContent.quoteRole
+      ? legacyContent.quoteRole
+      : "Global Division";
+
   return (
     <section className="investment-section" id={sectionId}>
       <div className="section-shell investment-section__content">
-        <div className="investment-section__copy">
-          <h2 className="section-title section-title--light">{content.title}</h2>
-          <p className="investment-section__description">{content.description}</p>
-          <div className="investment-section__stats">
-            {content.stats.map((stat) => (
-              <div key={stat.label} className="investment-stat">
-                <div className="investment-stat__value">{stat.value}</div>
-                <div className="investment-stat__label">{stat.label}</div>
-              </div>
+        <div className="investment-section__left">
+          <h2 className="investment-section__title">
+            {heading.map((line, index) => (
+              <span key={`${line}-${index}`} className="investment-section__title-line">
+                {line}
+              </span>
             ))}
+          </h2>
+
+          <div className="investment-section__list">
+            {items.map((item, index) => {
+              const Icon=Icons[item.icon as keyof typeof Icons] as React.ElementType
+              return(
+                <article key={`${item.title}-${index}`} className="investment-feature">
+                <div className="investment-feature__icon" aria-hidden="true">
+                  {Icon ? <Icon size={14}/>: null}
+                 
+                </div>
+                <div className="investment-feature__body">
+                  <h3 className="investment-feature__title">{item.title}</h3>
+                  <p className="investment-feature__description">{item.description}</p>
+                </div>
+              </article>
+              )
+            })}
           </div>
         </div>
 
-        <div className="investment-chart">
-          <div className="investment-chart__header">
-            <span>{content.chart.title}</span>
-            <span className="investment-chart__delta">{content.chart.delta}</span>
-          </div>
-          <div className="investment-chart__bars">
-            {content.chart.values.map((value, index) => (
-              <div key={content.chart.labels[index]} className="investment-chart__bar-group">
-                <div className="investment-chart__track">
-                  <div
-                    className={`investment-chart__bar${
-                      index === 3 ? " investment-chart__bar--featured" : ""
-                    }`}
-                    style={{ height: `${value}%` }}
-                  ></div>
-                </div>
-                <span className="investment-chart__label">{content.chart.labels[index]}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <aside className="investment-section__quote-card">
+          <p className="investment-section__quote">{quoteText}</p>
+          <div className="investment-section__quote-divider" aria-hidden="true" />
+          <p className="investment-section__quote-author">{quoteAuthor}</p>
+          <p className="investment-section__quote-role">{quoteRole}</p>
+        </aside>
       </div>
     </section>
   );

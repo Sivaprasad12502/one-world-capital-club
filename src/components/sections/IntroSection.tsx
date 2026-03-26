@@ -11,7 +11,7 @@ export default function IntroSection({
   content: IntroContent;
   anchorId?: string;
 }) {
-  console.log("IntroSection content :", content)
+
   return (
     <section className="intro-section section-shell" id={anchorId ?? undefined}>
       <div className="intro-section__content">

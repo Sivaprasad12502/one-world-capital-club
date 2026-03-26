@@ -8,9 +8,62 @@ type NavItem = { label: string; href: string };
 type PageSummary = { slug: string; title: string };
 type FooterLink = { label: string; href: string };
 type ContactRow = { type: "location" | "phone" | "mail"; value: string };
+type FooterMetaLink = { label: string; href: string; icon?: string };
 type FooterLinkColumn = { title: string; links: FooterLink[] };
 type FooterContactColumn = { title: string; contact: ContactRow[] };
 type FooterColumn = FooterLinkColumn | FooterContactColumn;
+
+function formatMetaLinks(
+  items: Array<string | FooterMetaLink>,
+  fallbackHref: string,
+  withIcon: boolean,
+) {
+  return items
+    .map((item) => {
+      if (typeof item === "string") {
+        return withIcon ? `globe|${item}|${fallbackHref}` : `${item}|${fallbackHref}`;
+      }
+      if (withIcon) {
+        const icon = item.icon ?? "globe";
+        return `${icon}|${item.label}|${item.href || fallbackHref}`;
+      }
+      return `${item.label}|${item.href || fallbackHref}`;
+    })
+    .join("\n");
+}
+
+function parseSocialMetaLinks(input: string): FooterMetaLink[] {
+  return input
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = line.split("|").map((part) => part.trim());
+      if (parts.length >= 3) {
+        return { icon: parts[0], label: parts[1], href: parts[2] || "/contact" };
+      }
+      if (parts.length === 2) {
+        return { label: parts[0], href: parts[1] || "/contact" };
+      }
+      return { label: parts[0], href: "/contact" };
+    })
+    .filter((item) => item.label);
+}
+
+function parseLegalMetaLinks(input: string): FooterMetaLink[] {
+  return input
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = line.split("|").map((part) => part.trim());
+      if (parts.length >= 2) {
+        return { label: parts[0], href: parts[1] || "/contact" };
+      }
+      return { label: parts[0], href: "/contact" };
+    })
+    .filter((item) => item.label);
+}
 
 function isLinkColumn(column: FooterColumn): column is FooterLinkColumn {
   return "links" in column;
@@ -39,8 +92,8 @@ export default function SiteGlobalEditClient() {
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [copyright, setCopyright] = useState("");
-  const [social, setSocial] = useState("");
-  const [legal, setLegal] = useState("");
+  const [socialLinks, setSocialLinks] = useState("");
+  const [legalLinks, setLegalLinks] = useState("");
   const [clientLogosFlag, setClientLogosFlag] = useState(true);
 
   useEffect(() => {
@@ -62,8 +115,8 @@ export default function SiteGlobalEditClient() {
         setBrand(d.footerMeta?.brand ?? "");
         setDescription(d.footerMeta?.description ?? "");
         setCopyright(d.footerMeta?.copyright ?? "");
-        setSocial((d.footerMeta?.social ?? []).join(", "));
-        setLegal((d.footerMeta?.legal ?? []).join(", "));
+        setSocialLinks(formatMetaLinks((d.footerMeta?.social ?? []) as Array<string | FooterMetaLink>, "/contact", true));
+        setLegalLinks(formatMetaLinks((d.footerMeta?.legal ?? []) as Array<string | FooterMetaLink>, "/contact", false));
         setClientLogosFlag(d.featureFlags?.clientLogos !== false);
       } catch (e) {
         if (!cancelled) setMessage(e instanceof Error ? e.message : "Load error");
@@ -205,9 +258,9 @@ export default function SiteGlobalEditClient() {
       footerMeta: {
         brand,
         description,
-        social: social.split(",").map((s) => s.trim()).filter(Boolean),
+        social: parseSocialMetaLinks(socialLinks),
         copyright,
-        legal: legal.split(",").map((s) => s.trim()).filter(Boolean),
+        legal: parseLegalMetaLinks(legalLinks),
       },
       featureFlags: { clientLogos: clientLogosFlag },
     };
@@ -464,12 +517,22 @@ export default function SiteGlobalEditClient() {
             <input value={copyright} onChange={(e) => setCopyright(e.target.value)} />
           </label>
           <label>
-            Social (comma-separated)
-            <input value={social} onChange={(e) => setSocial(e.target.value)} />
+            Social links (one per line: icon|label|href)
+            <textarea
+              rows={4}
+              value={socialLinks}
+              onChange={(e) => setSocialLinks(e.target.value)}
+              placeholder="globe|Global|/contact"
+            />
           </label>
           <label>
-            Legal links labels (comma-separated)
-            <input value={legal} onChange={(e) => setLegal(e.target.value)} />
+            Legal links (one per line: label|href)
+            <textarea
+              rows={3}
+              value={legalLinks}
+              onChange={(e) => setLegalLinks(e.target.value)}
+              placeholder="Privacy Policy|/privacy"
+            />
           </label>
           <h2>Feature flags</h2>
           <label style={{ display: "flex", alignItems: "center", gap: 8 }}>

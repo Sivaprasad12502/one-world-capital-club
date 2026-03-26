@@ -1,5 +1,5 @@
 import Link from "next/link";
-import SimpleIcon from "@/components/sections/SimpleIcon";
+import { Globe, Landmark, Mail, Phone } from "lucide-react";
 
 type FooterLink = { label: string; href: string };
 type ContactRow = { type: "location" | "phone" | "mail"; value: string };
@@ -7,6 +7,37 @@ type ContactRow = { type: "location" | "phone" | "mail"; value: string };
 type FooterColumn =
   | { title: string; links: FooterLink[] }
   | { title: string; contact: ContactRow[] };
+
+type FooterMetaLink = { label: string; href: string; icon?: string };
+
+function normalizeMetaLinks(
+  links: Array<string | FooterMetaLink>,
+  defaultHref: string,
+): FooterMetaLink[] {
+  return links
+    .map((item) => {
+      if (typeof item === "string") {
+        return { label: item, href: defaultHref };
+      }
+      return {
+        label: item.label,
+        href: item.href || defaultHref,
+        icon: item.icon,
+      };
+    })
+    .filter((item) => item.label);
+}
+
+function SocialIcon({ token }: { token?: string }) {
+  const key = (token ?? "").trim().toLowerCase();
+  if (key.includes("mail") || key.includes("email")) {
+    return <Mail aria-hidden="true" />;
+  }
+  if (key.includes("phone") || key.includes("call") || key.includes("whatsapp")) {
+    return <Phone aria-hidden="true" />;
+  }
+  return <Globe aria-hidden="true" />;
+}
 
 export default function SiteFooter({
   columns,
@@ -16,25 +47,31 @@ export default function SiteFooter({
   meta: {
     brand: string;
     description: string;
-    social: string[];
+    social: Array<string | FooterMetaLink>;
     copyright: string;
-    legal: string[];
+    legal: Array<string | FooterMetaLink>;
   };
 }) {
+  const socialLinks = normalizeMetaLinks(meta.social ?? [], "/contact");
+  const legalLinks = normalizeMetaLinks(meta.legal ?? [], "/contact");
+
   return (
     <footer className="site-footer">
       <div className="section-shell">
         <div className="site-footer__grid">
           <div className="site-footer__brand">
             <div className="site-footer__brand-line">
-              <span className="site-footer__brand-mark"></span>
+              <span className="site-footer__brand-mark" aria-hidden="true">
+                <Landmark />
+              </span>
               <span>{meta.brand}</span>
             </div>
             <p className="site-footer__brand-copy">{meta.description}</p>
             <div className="site-footer__social">
-              {meta.social.map((network) => (
-                <Link key={network} href="/contact" className="site-footer__social-link">
-                  {network}
+              {socialLinks.map((network) => (
+                <Link key={`${network.label}-${network.href}`} href={network.href} className="site-footer__social-link">
+                  <SocialIcon token={network.icon ?? network.label} />
+                  <span className="visually-hidden">{network.label}</span>
                 </Link>
               ))}
             </div>
@@ -55,7 +92,6 @@ export default function SiteFooter({
                 <ul className="site-footer__list site-footer__list--contact">
                   {column.contact.map((item) => (
                     <li key={item.value} className="site-footer__contact-item">
-                      <SimpleIcon name={item.type} className="site-footer__contact-icon" />
                       <span>{item.value}</span>
                     </li>
                   ))}
@@ -68,9 +104,9 @@ export default function SiteFooter({
         <div className="site-footer__meta">
           <p>{meta.copyright}</p>
           <div className="site-footer__legal">
-            {meta.legal.map((item) => (
-              <Link key={item} href="/contact">
-                {item}
+            {legalLinks.map((item) => (
+              <Link key={`${item.label}-${item.href}`} href={item.href}>
+                {item.label}
               </Link>
             ))}
           </div>

@@ -50,13 +50,13 @@ export default function SectionRenderer({
       return <InvestmentSection content={section.data as never} />;
     case "clientLogos":
       return <ClientLogosSection content={section.data as never} />;
-    case "cta":
-      return (
-        <CtaSection
-          content={section.data as never}
-          anchorId={pageSlug === "contact" ? undefined : "contact"}
-        />
-      );
+    // case "cta":
+    //   return (
+    //     <CtaSection
+    //       content={section.data as never}
+    //       anchorId={pageSlug === "contact" ? undefined : "contact"}
+    //     />
+    //   );
     case "contact":
       return <ContactBlockSection content={section.data as never} />;
     case "contactHero":
