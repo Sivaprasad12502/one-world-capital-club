@@ -17,6 +17,9 @@ export default async function MarketingPageView({ slug }: { slug: string }) {
   const featureFlags = (global?.featureFlags as Record<string, boolean> | undefined) ?? {};
   const sorted = [...pageView.effectiveSections].sort((a, b) => a.order - b.order);
 
+  console.log("sorted sections for pageView", sorted)
+
+
   return (
     <>
       {sorted.map((section) => (

@@ -52,6 +52,29 @@ export const servicesDataSchema = z.object({
   cards: z.array(serviceCardSchema),
 });
 
+const servicesGridCardSchema = z.object({
+  category: z.string(),
+  title: z.string(),
+  icon: z.string(),
+  description: z.string(),
+  features: z.array(z.string()),
+  cta: z.string(),
+});
+
+export const servicesGridDataSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  filters: z.array(z.string()).min(1),
+  cards: z.array(servicesGridCardSchema).min(1),
+});
+
+export const servicesCtaDataSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  primaryAction: z.object({ label: z.string(), href: z.string() }),
+  secondaryAction: z.object({ label: z.string(), href: z.string() }),
+});
+
 export const whyChooseItemSchema = z.object({
   title:z.string(),
   // description: z.string().optional(),
@@ -105,6 +128,38 @@ export const contactHeroDataSchema = z.object({
   backgroundImage: z.string(),
 });
 
+export const industriesHeroDataSchema = z.object({
+  badge: z.string(),
+  title: z.array(z.string()).min(1),
+  description: z.string(),
+  primaryAction: z.object({ label: z.string(), href: z.string() }),
+  secondaryAction: z.object({ label: z.string(), href: z.string() }),
+});
+
+const industriesGridItemSchema = z.object({
+  icon: z.string(),
+  title: z.string(),
+  description: z.string(),
+});
+
+export const industriesGridDataSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  items: z.array(industriesGridItemSchema).min(1),
+  partnerCard: z.object({
+    title: z.string(),
+    description: z.string(),
+    href: z.string(),
+  }),
+});
+
+export const industriesCtaDataSchema = z.object({
+  title: z.array(z.string()).min(1),
+  description: z.string(),
+  primaryAction: z.object({ label: z.string(), href: z.string() }),
+  secondaryAction: z.object({ label: z.string(), href: z.string() }),
+});
+
 const contactInfoItemSchema = z.object({
   title: z.string(),
   lines: z.array(z.string()),
@@ -122,11 +177,25 @@ export const contactInquiryDataSchema = z.object({
   mapLabelTitle: z.string(),
   mapLabelSubtitle: z.string(),
 });
+export const serviceHeroDataSchema=z.object({
+  title: z.array(z.string()).min(1),
+  description: z.string(),
+  backgroundImage:z.string()
+})
 
 export const aboutHeroDataSchema = z.object({
-  title: z.string(),
+  title: z.array(z.string()),
   description: z.string(),
   backgroundImage: z.string(),
+});
+
+export const aboutIntroDataSchema = z.object({
+  badge: z.string(),
+  title: z.array(z.string()).min(1),
+  description: z.array(z.string()).min(1),
+  imageCaption: z.string(),
+  image: z.string(),
+  imageAlt: z.string().optional(),
 });
 
 const aboutContentCardSchema = z.object({
@@ -138,7 +207,7 @@ const aboutContentCardSchema = z.object({
 });
 
 export const aboutVisionMissionDataSchema = z.object({
-  cards: z.array(aboutContentCardSchema).min(1),
+  items: z.array(aboutContentCardSchema).min(1),
 });
 
 export const aboutAdvantageDataSchema = z.object({
@@ -160,11 +229,19 @@ export const aboutValuesDataSchema = z.object({
   title: z.string(),
   items: z.array(aboutValueItemSchema).min(1),
 });
+export const aboutCtaDataSchema=z.object({
+  title: z.array(z.string()).min(1),
+  description: z.string(),
+  primaryAction: z.object({ label: z.string(),href: z.string()}),
+  secondaryAction: z.object({label:z.string(),href:z.string()})
+})
 
 const sectionDataValidators: Record<string, z.ZodType<unknown>> = {
   hero: heroDataSchema,
   intro: introDataSchema,
   services: servicesDataSchema,
+  servicesGrid: servicesGridDataSchema,
+  servicesCTA: servicesCtaDataSchema,
   whyChoose: whyChooseDataSchema,
   investment: investmentDataSchema,
   clientLogos: clientLogosDataSchema,
@@ -172,17 +249,35 @@ const sectionDataValidators: Record<string, z.ZodType<unknown>> = {
   contact: contactDataSchema,
   contactHero: contactHeroDataSchema,
   contactInquiry: contactInquiryDataSchema,
+  servicesHero: serviceHeroDataSchema,
+  industriesHero: industriesHeroDataSchema,
+  industriesGrid: industriesGridDataSchema,
+  industriesCta: industriesCtaDataSchema,
   aboutHero: aboutHeroDataSchema,
+  aboutIntro: aboutIntroDataSchema,
   aboutVisionMission: aboutVisionMissionDataSchema,
   aboutAdvantage: aboutAdvantageDataSchema,
   aboutValues: aboutValuesDataSchema,
+  aboutCTA: aboutCtaDataSchema,
 };
 
 export function parseSectionData(type: string, data: unknown): unknown {
-  if (!SECTION_TYPES.includes(type as SectionType)) {
+  const normalizedType =
+    type === "industrieshero"
+      ? "industriesHero"
+      : type === "industriesgrid"
+        ? "industriesGrid"
+        : type === "industriescta"
+          ? "industriesCta"
+        : type === "servicesgrid"
+          ? "servicesGrid"
+        : type === "servicescta"
+          ? "servicesCTA"
+        : type;
+  if (!SECTION_TYPES.includes(normalizedType as SectionType)) {
     throw new Error(`Unknown section type: ${type}`);
   }
-  const schema = sectionDataValidators[type];
+  const schema = sectionDataValidators[normalizedType];
   if (!schema) {
     throw new Error(`Unknown section type: ${type}`);
   }

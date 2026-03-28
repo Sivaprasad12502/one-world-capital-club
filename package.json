@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "seed": "tsx scripts/seed.ts",
+    "seed": "tsx scripts/seeed.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

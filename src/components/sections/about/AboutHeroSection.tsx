@@ -7,7 +7,9 @@ export default function AboutHeroSection({ content }: { content: AboutHeroConten
   return (
     <section className="about-hero">
       <div className="about-hero__background" aria-hidden="true">
-        <img
+       {
+        content.backgroundImage&&(
+           <img
           className="about-hero__background-image"
           src={content.backgroundImage}
           alt=""
@@ -15,6 +17,8 @@ export default function AboutHeroSection({ content }: { content: AboutHeroConten
           height={900}
           decoding="async"
         />
+        )
+       }
       </div>
       <div className="about-hero__gradient" aria-hidden="true" />
       <div className="about-hero__content section-shell">

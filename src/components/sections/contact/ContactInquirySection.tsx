@@ -3,13 +3,21 @@
 import { useState } from "react";
 import type { z } from "zod";
 import type { contactInquiryDataSchema } from "@/schemas/sections";
-import SimpleIcon from "./SimpleIcon";
+import SimpleIcon from "../SimpleIcon";
 
 type ContactInquiryContent = z.infer<typeof contactInquiryDataSchema>;
 
 export default function ContactInquirySection({ content }: { content: ContactInquiryContent }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">("idle");
   const [message, setMessage] = useState("");
+  const officeAddress =
+    content.officeItems.find((item) => item.icon === "location")?.lines.join(", ") ??
+    content.officeItems[0]?.lines.join(", ") ??
+    "Nad Al Sheba, Dubai, United Arab Emirates";
+  const mapEmbedUrl =
+    content.mapImage.includes("google.com/maps") || content.mapImage.includes("google.com/maps/embed")
+      ? content.mapImage
+      : `https://www.google.com/maps?q=${encodeURIComponent(officeAddress)}&output=embed`;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -19,7 +27,7 @@ export default function ContactInquirySection({ content }: { content: ContactInq
     const body = {
       name: String(fd.get("name") ?? ""),
       email: String(fd.get("email") ?? ""),
-      phone: String(fd.get("phone") ?? ""),
+      phone: "",
       company: String(fd.get("company") ?? ""),
       inquiryType: String(fd.get("inquiryType") ?? ""),
       message: String(fd.get("message") ?? ""),
@@ -50,7 +58,9 @@ export default function ContactInquirySection({ content }: { content: ContactInq
       <div className="section-shell contact-inquiry__grid">
         <div className="contact-inquiry__card">
           <h2 className="contact-inquiry__form-title">{content.formTitle}</h2>
-          <p className="contact-inquiry__form-description">{content.formDescription}</p>
+          {content.formDescription ? (
+            <p className="contact-inquiry__form-description">{content.formDescription}</p>
+          ) : null}
 
           <form className="contact-inquiry__form" onSubmit={onSubmit}>
             <div className="contact-inquiry__row">
@@ -78,53 +88,39 @@ export default function ContactInquirySection({ content }: { content: ContactInq
 
             <div className="contact-inquiry__row">
               <label className="contact-inquiry__field">
-                <span>Phone Number</span>
-                <input
-                  name="phone"
-                  type="text"
-                  required
-                  className="contact-inquiry__input"
-                  placeholder="+971 50 000 0000"
-                />
-              </label>
-              <label className="contact-inquiry__field">
-                <span>Company Name</span>
+                <span>Company / Institution</span>
                 <input
                   name="company"
                   type="text"
                   className="contact-inquiry__input"
-                  placeholder="Global Trade Inc."
+                  placeholder="Global Capital Partners"
                 />
               </label>
+              <label className="contact-inquiry__field">
+                <span>Subject</span>
+                <select name="inquiryType" required className="contact-inquiry__input contact-inquiry__select">
+                  {content.inquiryOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
-
-            <label className="contact-inquiry__field">
-              <span>Inquiry Type</span>
-              <select name="inquiryType" required className="contact-inquiry__input contact-inquiry__select">
-                {content.inquiryOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
 
             <label className="contact-inquiry__field">
               <span>Message</span>
               <textarea
                 name="message"
                 required
-                rows={6}
+                rows={7}
                 className="contact-inquiry__input contact-inquiry__textarea"
-                placeholder="How can we help your business today?"
+                placeholder="How can we asist you?"
               />
             </label>
 
             <button type="submit" className="contact-inquiry__submit" disabled={status === "loading"}>
-              <span>{status === "loading" ? "Submitting..." : content.submitLabel}</span>
-              <span className="contact-inquiry__submit-arrow" aria-hidden="true">
-                &gt;
-              </span>
+              <span>{status === "loading" ? "SENDING..." : content.submitLabel.toUpperCase()}</span>
             </button>
 
             {message ? (
@@ -134,10 +130,7 @@ export default function ContactInquirySection({ content }: { content: ContactInq
         </div>
 
         <div className="contact-inquiry__details">
-          <div className="contact-inquiry__details-heading">
-            <div className="contact-inquiry__details-accent"></div>
-            <h2>{content.officeHeading}</h2>
-          </div>
+          <h2 className="contact-inquiry__office-title">{content.officeHeading}</h2>
 
           <div className="contact-inquiry__details-list">
             {content.officeItems.map((item) => (
@@ -146,7 +139,7 @@ export default function ContactInquirySection({ content }: { content: ContactInq
                   <SimpleIcon name={item.icon} className="contact-inquiry__detail-icon-svg" />
                 </div>
                 <div className="contact-inquiry__detail-copy">
-                  <h3>{item.title}</h3>
+                  <h3>{item.title.toUpperCase()}</h3>
                   {item.lines.map((line) => (
                     <p key={line}>{line}</p>
                   ))}
@@ -156,21 +149,13 @@ export default function ContactInquirySection({ content }: { content: ContactInq
           </div>
 
           <div className="contact-inquiry__map">
-            <img
-              src={content.mapImage}
-              alt="Map showing the company location"
-              width={1200}
-              height={800}
-              decoding="async"
-              className="contact-inquiry__map-image"
+            <iframe
+              title="Office location map"
+              src={mapEmbedUrl}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="contact-inquiry__map-frame"
             />
-            <div className="contact-inquiry__map-label">
-              <SimpleIcon name="location" className="contact-inquiry__map-label-icon" />
-              <div>
-                <strong>{content.mapLabelTitle}</strong>
-                <span>{content.mapLabelSubtitle}</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

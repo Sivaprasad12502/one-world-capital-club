@@ -1,6 +1,6 @@
 import type { z } from "zod";
 import type { introDataSchema } from "@/schemas/sections";
-import SimpleIcon from "./SimpleIcon";
+import SimpleIcon from "../SimpleIcon";
 
 type IntroContent = z.infer<typeof introDataSchema>;
 

@@ -75,6 +75,69 @@ const servicesData = {
   ],
 };
 
+const servicesGridData = {
+  title: "Strategic Solutions",
+  description:
+    "Explore our diverse portfolio of 90+ specialized services categorized by industry and expertise.",
+  filters: ["All Services", "Investment", "Financial", "Technology"],
+  cards: [
+    {
+      category: "Investment",
+      title: "Investment Services",
+      icon: "DollarSign",
+      description:
+        "Global asset management, private equity investments, and portfolio diversification strategies tailored for institutional and private investors.",
+      features: ["Private Equity", "Asset Management", "Wealth Preservation"],
+      cta: "Learn More",
+    },
+    {
+      category: "Finance",
+      title: "Financial Advisory",
+      icon: "BarChart",
+      description:
+        "Strategic financial planning, capital restructuring, and risk assessment to ensure long-term fiscal health and regulatory compliance.",
+      features: ["Capital Structuring", "Risk Management", "Mergers & Acquisitions"],
+      cta: "Learn More",
+    },
+    {
+      category: "Consultancy",
+      title: "Business Management",
+      icon: "Briefcase",
+      description:
+        "Operational intelligence, market entry strategies, and organizational restructuring for modern enterprises in a globalized economy.",
+      features: ["Market Entry", "Operational Efficiency", "Corporate Governance"],
+      cta: "Learn More",
+    },
+    {
+      category: "Development",
+      title: "Project Development",
+      icon: "Building",
+      description:
+        "End-to-end management of infrastructure and real estate projects, from feasibility studies to execution planning and delivery.",
+      features: ["Real Estate", "Infrastructure Planning", "Feasibility Studies"],
+      cta: "Learn More",
+    },
+    {
+      category: "Technology",
+      title: "Technology & Innovation",
+      icon: "Monitor",
+      description:
+        "Driving digital transformation through fintech solutions, blockchain integration, and advanced technology consulting.",
+      features: ["Fintech Solutions", "Blockchain Consulting", "Digital Strategy"],
+      cta: "Learn More",
+    },
+    {
+      category: "Specialized",
+      title: "Specialized Consulting",
+      icon: "FlaskConical",
+      description:
+        "Niche expertise in emerging markets, sustainability-focused investments, and unique cross-border trade facilitation.",
+      features: ["ESG Consulting", "Emerging Markets", "Trade Facilitation"],
+      cta: "Learn More",
+    },
+  ],
+};
+
 const whyChooseData = {
   items: [
     {
@@ -152,6 +215,19 @@ const aboutHeroData = {
   backgroundImage: "https://www.figma.com/api/mcp/asset/c4d803f5-67dd-4a5e-8068-fec955887a41",
 };
 
+const aboutIntroData = {
+  eyebrow: "OUR PRESENCE",
+  title: ["A Strategic Hub in Dubai,", "A Global Reach."],
+  paragraphs: [
+    "One World Capital Club L.L.C FZE is strategically headquartered in the United Arab Emirates, serving as a pivotal gateway between the East and the West.",
+    "Our firm specializes in high-level financial advisory, cross-border investment strategies, and exclusive networking for elite investors. We leverage Dubai's unique position as a global financial hub to provide our clients with unparalleled access to emerging opportunities and established markets alike.",
+    "With a robust network spanning major financial capitals, we facilitate seamless capital flow and strategic partnerships that transcend geographical boundaries.",
+  ],
+  quote: '"Connecting sophisticated capital with global opportunity."',
+  image: "/about/about-intro-globe.png",
+  imageAlt: "Connected globe illustration highlighting global investment reach",
+};
+
 const aboutVisionMissionData = {
   cards: [
     {
@@ -217,10 +293,11 @@ const aboutValuesData = {
 };
 
 const aboutCtaData = {
-  title: "Ready to expand your global footprint?",
+  title: ["Ready to Explore Global Opportunities?"],
   description:
-    "Our consultants are ready to guide you through the intricacies of the UAE corporate landscape.",
-  action: { label: "Schedule a Consultation", href: "/contact" },
+    "Connect with our advisory team in Dubai and tap into our worldwide network of investment professionals.",
+  primaryAction: { label: "Join the Club", href: "/contact" },
+  secondaryAction: { label: "Request a Briefing", href: "/contact" },
 };
 
 const contactHeroData = {
@@ -306,10 +383,11 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
       "Learn about One World Trade Centre FZE strategic operations and investment focus.",
     effectiveSections: sections("about", [
       { type: "aboutHero", order: 0, data: aboutHeroData },
-      { type: "aboutVisionMission", order: 1, data: aboutVisionMissionData },
-      { type: "aboutAdvantage", order: 2, data: aboutAdvantageData },
-      { type: "aboutValues", order: 3, data: aboutValuesData },
-      { type: "cta", order: 4, data: aboutCtaData },
+      { type: "aboutIntro", order: 1, data: aboutIntroData },
+      { type: "aboutVisionMission", order: 2, data: aboutVisionMissionData },
+      { type: "aboutAdvantage", order: 3, data: aboutAdvantageData },
+      { type: "aboutValues", order: 4, data: aboutValuesData },
+      { type: "aboutCTA", order: 5, data: aboutCtaData },
     ]),
     isPreview: false,
   },
@@ -320,7 +398,7 @@ const FALLBACK_BY_SLUG: Record<string, PublicPageView> = {
     seoTitle: "Services | OWTC FZE",
     seoDescription: "Core competencies: trading, security, fintech, corporate services, and more.",
     effectiveSections: sections("services", [
-      { type: "services", order: 0, data: servicesData },
+      { type: "servicesGrid", order: 0, data: servicesGridData },
       { type: "cta", order: 1, data: ctaData },
     ]),
     isPreview: false,

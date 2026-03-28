@@ -43,7 +43,17 @@ export async function PATCH(request: Request, context: RouteContext) {
     return jsonError("not_found", "Section not found", 404);
   }
   const current = sections[idx];
-  const type = parsed.data.type ?? current.type;
+  const incomingType = parsed.data.type ?? current.type;
+  const type =
+    incomingType === "industrieshero"
+      ? "industriesHero"
+      : incomingType === "industriesgrid"
+        ? "industriesGrid"
+        : incomingType === "industriescta"
+          ? "industriesCta"
+        : incomingType === "servicescta"
+          ? "servicesCTA"
+        : incomingType;
   if (parsed.data.data !== undefined) {
     try {
       const data = parseSectionData(type, parsed.data.data);
@@ -63,6 +73,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   } else {
     sections[idx] = {
       ...current,
+      type: type as PageSection["type"],
       order: parsed.data.order ?? current.order,
     };
   }

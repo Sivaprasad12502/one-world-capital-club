@@ -20,7 +20,9 @@ export default function SiteHeader({
 }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  console.log('NavItems:', navItems)
+
+  console.log("navItems: on siteHeader" ,navItems);
+  
   return (
     <header className="site-header">
       <div className="site-header__inner">

@@ -7,7 +7,9 @@ import HeroSectionForm from "@/components/admin/HeroSectionForm";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import {
   AboutAdvantageSectionForm,
+  AboutCtaSectionForm,
   AboutHeroSectionForm,
+  AboutIntroSectionForm,
   AboutValuesSectionForm,
   AboutVisionMissionSectionForm,
   ClientLogosSectionForm,
@@ -16,9 +18,15 @@ import {
   ContactInquirySectionForm,
   CtaSectionForm,
   IntroSectionForm,
+  IndustriesCtaSectionForm,
+  IndustriesGridSectionForm,
+  IndustriesHeroSectionForm,
   InvestmentSectionForm,
   ServicesSectionForm,
+  ServicesGridSectionForm,
+  ServicesCtaSectionForm,
   WhyChooseSectionForm,
+  ServicesHeroSectionForm,
 } from "@/components/admin/SectionForms";
 
 type SectionRow = { id: string; type: string; order: number; data: Record<string, unknown> };
@@ -262,7 +270,18 @@ function SectionEditor({
   saveMessage?: string | null;
   saveMessageTone?: "success" | "error";
 }) {
-  const normalizedType = String(section.type).trim();
+  const normalizedType =
+    String(section.type).trim() === "industrieshero"
+      ? "industriesHero"
+      : String(section.type).trim() === "industriesgrid"
+        ? "industriesGrid"
+        : String(section.type).trim() === "industriescta"
+          ? "industriesCta"
+        : String(section.type).trim() === "servicesgrid"
+            ? "servicesGrid"
+          : String(section.type).trim() === "servicescta"
+            ? "servicesCTA"
+      : String(section.type).trim();
 
   switch (normalizedType) {
     case "hero":
@@ -288,6 +307,26 @@ function SectionEditor({
     case "services":
       return (
         <ServicesSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "servicesGrid":
+      return (
+        <ServicesGridSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "servicesCTA":
+      return (
+        <ServicesCtaSectionForm
           section={section}
           onSave={onSave}
           previewHref={previewHref}
@@ -375,6 +414,16 @@ function SectionEditor({
           saveMessageTone={saveMessageTone}
         />
       );
+    case "aboutIntro":
+      return (
+        <AboutIntroSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
     case "aboutVisionMission":
       return (
         <AboutVisionMissionSectionForm
@@ -398,6 +447,56 @@ function SectionEditor({
     case "aboutValues":
       return (
         <AboutValuesSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "aboutCTA":
+      return (
+        <AboutCtaSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "servicesHero":
+      return (
+        <ServicesHeroSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "industriesHero":
+      return (
+        <IndustriesHeroSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "industriesGrid":
+      return (
+        <IndustriesGridSectionForm
+          section={section}
+          onSave={onSave}
+          previewHref={previewHref}
+          saveMessage={saveMessage}
+          saveMessageTone={saveMessageTone}
+        />
+      );
+    case "industriesCta":
+      return (
+        <IndustriesCtaSectionForm
           section={section}
           onSave={onSave}
           previewHref={previewHref}

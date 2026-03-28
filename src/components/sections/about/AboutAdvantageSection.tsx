@@ -1,10 +1,11 @@
 import type { z } from "zod";
 import type { aboutAdvantageDataSchema } from "@/schemas/sections";
-import SimpleIcon from "./SimpleIcon";
+import SimpleIcon from "../SimpleIcon";
 
 type AboutAdvantageContent = z.infer<typeof aboutAdvantageDataSchema>;
 
 export default function AboutAdvantageSection({ content }: { content: AboutAdvantageContent }) {
+
   return (
     <section className="about-advantage">
       <div className="section-shell about-advantage__content">

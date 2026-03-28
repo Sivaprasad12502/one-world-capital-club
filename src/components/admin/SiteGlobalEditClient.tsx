@@ -137,6 +137,14 @@ export default function SiteGlobalEditClient() {
     });
   }
 
+  function addNavItem() {
+    setNavItems((prev) => [...prev, { label: "", href: "" }]);
+  }
+
+  function removeNavItem(index: number) {
+    setNavItems((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
+  }
+
   function updateFooterColumnTitle(index: number, title: string) {
     setFooterColumns((prev) => {
       const next = [...prev];
@@ -327,11 +335,25 @@ export default function SiteGlobalEditClient() {
                 placeholder="Href"
               />
               </div>
+              <button
+                type="button"
+                className="admin-button-secondary"
+                onClick={() => removeNavItem(i)}
+              >
+                Remove nav item
+              </button>
               <p className="admin-muted" style={{ margin: 0 }}>
                 Current link: <strong>{item.href || "(empty)"}</strong>
               </p>
             </div>
           ))}
+          <button
+            type="button"
+            className="admin-button-secondary"
+            onClick={addNavItem}
+          >
+            Add nav item
+          </button>
           <h2>Logo</h2>
           <ImageUploadField
             label="Logo URL"
