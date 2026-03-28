@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  type FormHTMLAttributes,
+  type RefObject,
+} from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import SectionSaveFooter from "@/components/admin/SectionSaveFooter";
@@ -32,12 +38,135 @@ function SectionHeading({ section }: { section: SectionRow }) {
   );
 }
 
+function FieldHint({ children }: { children: string }) {
+  return <p className="admin-field-hint">{children}</p>;
+}
+
+function getFieldHintFromLabel(labelText: string) {
+  const key = labelText.toLowerCase().replace(/\s+/g, " ").trim();
+  if (!key) return null;
+
+  if (key.includes("eyebrow"))
+    return "Short intro text shown above the main heading.";
+  if (key.includes("badge")) return "A compact tag line shown above the title.";
+  if (key.includes("title lines") || key.includes("heading lines")) {
+    return "Add one line per row. Each line renders as a separate heading line.";
+  }
+  if (key.includes("title")) return "Main title text shown for this block.";
+  if (key.includes("description lines"))
+    return "Use one line per row for multiple description points.";
+  if (key.includes("description"))
+    return "Write a concise supporting paragraph for this section.";
+  if (
+    key.includes("subheading") ||
+    key.includes("subtitle") ||
+    key.includes("subtext")
+  ) {
+    return "Supporting text shown under the main heading.";
+  }
+  if (
+    key.includes("highlights") ||
+    key.includes("points") ||
+    key.includes("features")
+  ) {
+    return "Add one item per line for a clean bullet-style layout.";
+  }
+  if (key.includes("filter"))
+    return "Add one filter label per line (include an All option if needed).";
+  if (key.includes("category"))
+    return "Use a category that matches one of your filter labels.";
+  if (key.includes("stat"))
+    return "Short metric text, like 120+ clients or 15 years.";
+  if (key.includes("icon"))
+    return "Choose an icon that best matches this content item.";
+  if (key.includes("caption"))
+    return "Small text shown near or under the image.";
+  if (
+    key.includes("action label") ||
+    key.includes("cta label") ||
+    key === "label"
+  ) {
+    return "Button text users will see and click.";
+  }
+  if (key.includes("href") || key.includes("url")) {
+    return "Use a valid route like /contact or a full URL like https://example.com.";
+  }
+  if (key.includes("image"))
+    return "Upload or paste a clear image URL for this section.";
+  if (key.includes("form title"))
+    return "Heading shown above the contact form.";
+  if (key.includes("form description"))
+    return "Short helper text shown before form fields.";
+  if (key.includes("submit label")) return "Text shown on the submit button.";
+  if (key.includes("office"))
+    return "Office details shown in the contact information block.";
+  if (key.includes("map"))
+    return "Map image or label shown near the location details.";
+  if (key.includes("quote")) return "Quote content shown as testimonial text.";
+
+  return "Enter a clear value that matches this field's purpose.";
+}
+
+function useAutoFieldHints(formRef: RefObject<HTMLFormElement | null>) {
+  useEffect(() => {
+    const formEl = formRef.current;
+    if (!formEl) return;
+
+    const applyHints = () => {
+      const labels = formEl.querySelectorAll("label");
+      labels.forEach((label) => {
+        if (label.querySelector(".admin-field-hint")) return;
+        if (!label.querySelector("input, textarea, select, .admin-icon-picker"))
+          return;
+
+        const ownText = Array.from(label.childNodes)
+          .filter((node) => node.nodeType === Node.TEXT_NODE)
+          .map((node) => node.textContent ?? "")
+          .join(" ")
+          .trim();
+        const normalizedLabel = (ownText || label.textContent || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        const hintText = getFieldHintFromLabel(normalizedLabel);
+        if (!hintText) return;
+
+        const hint = document.createElement("p");
+        hint.className = "admin-field-hint";
+        hint.dataset.autoHint = "true";
+        hint.textContent = hintText;
+
+        const error = label.querySelector(".admin-field-error");
+        if (error) {
+          label.insertBefore(hint, error);
+          return;
+        }
+        label.appendChild(hint);
+      });
+    };
+
+    applyHints();
+    const observer = new MutationObserver(() => applyHints());
+    observer.observe(formEl, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [formRef]);
+}
+
+function SectionForm(props: FormHTMLAttributes<HTMLFormElement>) {
+  const formRef = useRef<HTMLFormElement>(null);
+  useAutoFieldHints(formRef);
+  return <form ref={formRef} {...props} />;
+}
+
 type IntroFormValues = {
   eyebrow: string;
   titleLines: string;
   description: string;
   highlightsLines: string;
   image: string;
+  more: string;
+  icon: string;
+  expcount: number;
+  // exptext: string;
 };
 
 function toIntroDefaultValues(data: Record<string, unknown>): IntroFormValues {
@@ -51,6 +180,10 @@ function toIntroDefaultValues(data: Record<string, unknown>): IntroFormValues {
       ? (data.highlights as string[]).join("\n")
       : "",
     image: (data.image as string) ?? "",
+    more: (data.more as string) ?? "",
+    icon: (data.icon as string) ?? "",
+    expcount: (data.expcount as number) ?? 0,
+    // exptext: (data.exptext as string) ?? "",
   };
 }
 
@@ -67,6 +200,7 @@ export function IntroSectionForm({
   );
   const {
     register,
+    control,
     setValue,
     watch,
     handleSubmit,
@@ -87,12 +221,16 @@ export function IntroSectionForm({
         .map((line) => line.trim())
         .filter(Boolean),
       image: values.image,
+      more: values.more,
+      icon: values.icon,
+      expcount: values.expcount,
+      // exptext: values.exptext,
     });
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -104,7 +242,11 @@ export function IntroSectionForm({
 
       <label>
         Eyebrow
-        <input {...register("eyebrow", { required: "Eyebrow is required" })} />
+        <input
+          {...register("eyebrow", { required: "Eyebrow is required" })}
+          placeholder="Small intro text above the main heading"
+        />
+        <FieldHint>Use 2-6 words to introduce this section.</FieldHint>
         {errors.eyebrow ? (
           <p className="admin-field-error">{errors.eyebrow.message}</p>
         ) : null}
@@ -115,7 +257,11 @@ export function IntroSectionForm({
         <textarea
           rows={4}
           {...register("titleLines", { required: "Title is required" })}
+          placeholder={"Trusted Growth Partner\nAcross Borders"}
         />
+        <FieldHint>
+          Each line becomes a separate heading line on the page.
+        </FieldHint>
         {errors.titleLines ? (
           <p className="admin-field-error">{errors.titleLines.message}</p>
         ) : null}
@@ -126,7 +272,9 @@ export function IntroSectionForm({
         <textarea
           rows={4}
           {...register("description", { required: "Description is required" })}
+          placeholder="Short paragraph that explains what this section is about."
         />
+        <FieldHint>Keep this concise, around 1-3 sentences.</FieldHint>
         {errors.description ? (
           <p className="admin-field-error">{errors.description.message}</p>
         ) : null}
@@ -139,11 +287,56 @@ export function IntroSectionForm({
           {...register("highlightsLines", {
             required: "At least one highlight is required",
           })}
+          placeholder={
+            "Strategic advisory\nRegulatory guidance\nMarket expansion support"
+          }
         />
+        <FieldHint>
+          Add one benefit per line. These are shown as highlight points.
+        </FieldHint>
         {errors.highlightsLines ? (
           <p className="admin-field-error">{errors.highlightsLines.message}</p>
         ) : null}
       </label>
+      <label>
+        More Info
+        <input
+          {...register("more", { required: "More info is required" })}
+          placeholder="Additional information about this section."
+        />
+        <Controller
+          name="icon"
+          control={control}
+          render={({ field }) => (
+            <IconPicker
+              value={typeof field.value === "string" ? field.value : ""}
+              onChange={(val) =>
+                field.onChange(typeof val === "string" ? val : "")
+              }
+            />
+          )}
+        />
+      </label>
+      <div>
+        <label>
+          Years of Experience
+          <input
+            {...register("expcount", {
+              required: "Experience count is required",
+              valueAsNumber: true,
+            })}
+            type="number"
+            placeholder="Number of years of experience"
+          />
+        </label>
+        {/* <label>
+          Experience Text
+          <input
+            {...register("exptext", { required: "Experience text is required" })}
+            placeholder="Description of your experience"
+          />
+        </label> */}
+      </div>
 
       <input
         type="hidden"
@@ -156,7 +349,9 @@ export function IntroSectionForm({
           setValue("image", value, { shouldDirty: true, shouldValidate: true })
         }
         folder={`sections/${section.type}`}
+        placeholder="/sections/intro/cover-image.webp"
       />
+      <FieldHint>Upload or paste a clear section image URL.</FieldHint>
       {errors.image ? (
         <p className="admin-field-error">{errors.image.message}</p>
       ) : null}
@@ -167,7 +362,7 @@ export function IntroSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -242,8 +437,8 @@ export function ServicesSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -255,7 +450,11 @@ export function ServicesSectionForm({
 
       <label>
         Title
-        <input {...register("title", { required: "Title is required" })} />
+        <input
+          {...register("title", { required: "Title is required" })}
+          placeholder="Services built for global businesses"
+        />
+        <FieldHint>Main heading for this services block.</FieldHint>
         {errors.title ? (
           <p className="admin-field-error">{errors.title.message}</p>
         ) : null}
@@ -266,31 +465,27 @@ export function ServicesSectionForm({
         <textarea
           rows={4}
           {...register("description", { required: "Description is required" })}
+          placeholder="Briefly describe your service offering and value."
         />
+        <FieldHint>Use a short summary that supports the heading.</FieldHint>
         {errors.description ? (
           <p className="admin-field-error">{errors.description.message}</p>
         ) : null}
       </label>
 
-      <div>
+      <div className="admin-section-group">
         <h4>Service cards</h4>
         {fields.map((field, index) => (
-          <div
-            key={field.id}
-            style={{
-              marginBottom: 16,
-              padding: 16,
-              border: "1px solid #e2e8f0",
-              borderRadius: 12,
-            }}
-          >
+          <div key={field.id} className="admin-section-card">
             <label>
               Card title
               <input
                 {...register(`cards.${index}.title`, {
                   required: "Card title is required",
                 })}
+                placeholder="Business Setup"
               />
+              <FieldHint>Short name of this service card.</FieldHint>
             </label>
             <label>
               Card description
@@ -299,21 +494,27 @@ export function ServicesSectionForm({
                 {...register(`cards.${index}.description`, {
                   required: "Card description is required",
                 })}
+                placeholder="Describe what this service includes."
               />
+              <FieldHint>1-2 lines explaining this service.</FieldHint>
             </label>
             <label>
-              Icon 
+              Icon
               <Controller
-              control={control}
-              name={`cards.${index}.icon`}
-              defaultValue=""
-              rules={{required:true}}
-              render={({field})=>(
-                <IconPicker
-                value={typeof field.value==="string"?field.value:""}
-                onChange={(val)=>field.onChange(val)}
-                />
-              )}/>
+                control={control}
+                name={`cards.${index}.icon`}
+                defaultValue=""
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <IconPicker
+                    value={typeof field.value === "string" ? field.value : ""}
+                    onChange={(val) => field.onChange(val)}
+                  />
+                )}
+              />
+              <FieldHint>
+                Pick a simple icon that visually matches this card.
+              </FieldHint>
               {/* Icon name
               <input
                 {...register(`cards.${index}.icon`, {
@@ -363,7 +564,7 @@ export function ServicesSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -464,8 +665,8 @@ export function ServicesGridSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -477,7 +678,11 @@ export function ServicesGridSectionForm({
 
       <label>
         Section title
-        <input {...register("title", { required: "Title is required" })} />
+        <input
+          {...register("title", { required: "Title is required" })}
+          placeholder="Explore Our Core Services"
+        />
+        <FieldHint>Primary heading shown above the service filters.</FieldHint>
         {errors.title ? (
           <p className="admin-field-error">{errors.title.message}</p>
         ) : null}
@@ -488,7 +693,9 @@ export function ServicesGridSectionForm({
         <textarea
           rows={3}
           {...register("description", { required: "Description is required" })}
+          placeholder="Introduce the full list of service categories."
         />
+        <FieldHint>Keep this as a short supporting paragraph.</FieldHint>
         {errors.description ? (
           <p className="admin-field-error">{errors.description.message}</p>
         ) : null}
@@ -501,31 +708,29 @@ export function ServicesGridSectionForm({
           {...register("filtersLines", {
             required: "At least one filter is required",
           })}
+          placeholder={"All\nAdvisory\nIncorporation\nCompliance"}
         />
+        <FieldHint>
+          One filter label per line (first line is usually All).
+        </FieldHint>
         {errors.filtersLines ? (
           <p className="admin-field-error">{errors.filtersLines.message}</p>
         ) : null}
       </label>
 
-      <div>
+      <div className="admin-section-group">
         <h4>Service cards</h4>
         {fields.map((field, index) => (
-          <div
-            key={field.id}
-            style={{
-              marginBottom: 16,
-              padding: 16,
-              border: "1px solid #e2e8f0",
-              borderRadius: 12,
-            }}
-          >
+          <div key={field.id} className="admin-section-card">
             <label>
               Category
               <input
                 {...register(`cards.${index}.category`, {
                   required: "Category is required",
                 })}
+                placeholder="Advisory"
               />
+              <FieldHint>Must match one of your filter labels.</FieldHint>
             </label>
             <label>
               Title
@@ -533,7 +738,9 @@ export function ServicesGridSectionForm({
                 {...register(`cards.${index}.title`, {
                   required: "Title is required",
                 })}
+                placeholder="Market Entry Strategy"
               />
+              <FieldHint>Service card title shown in the grid.</FieldHint>
             </label>
             <label>
               Icon
@@ -549,6 +756,9 @@ export function ServicesGridSectionForm({
                   />
                 )}
               />
+              <FieldHint>
+                Choose an icon that reflects this service type.
+              </FieldHint>
             </label>
             <label>
               Description
@@ -557,7 +767,11 @@ export function ServicesGridSectionForm({
                 {...register(`cards.${index}.description`, {
                   required: "Description is required",
                 })}
+                placeholder="Brief overview of this service card."
               />
+              <FieldHint>
+                Use a compact summary for better readability.
+              </FieldHint>
             </label>
             <label>
               Features (one per line)
@@ -566,7 +780,9 @@ export function ServicesGridSectionForm({
                 {...register(`cards.${index}.featuresLines`, {
                   required: "At least one feature is required",
                 })}
+                placeholder={"Feature one\nFeature two\nFeature three"}
               />
+              <FieldHint>Enter one feature per line.</FieldHint>
             </label>
             <label>
               CTA label
@@ -574,7 +790,9 @@ export function ServicesGridSectionForm({
                 {...register(`cards.${index}.cta`, {
                   required: "CTA label is required",
                 })}
+                placeholder="Learn More"
               />
+              <FieldHint>Button text users will click on this card.</FieldHint>
             </label>
             <button
               type="button"
@@ -610,7 +828,7 @@ export function ServicesGridSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -621,8 +839,8 @@ type WhyChooseItemFormValue = {
 };
 
 type WhyChooseFormValues = {
-  title:string,
-  subheading:string;
+  title: string;
+  subheading: string;
   items: WhyChooseItemFormValue[];
 };
 
@@ -634,16 +852,17 @@ function toWhyChooseDefaultValues(
     : [];
 
   return {
-    title:(data.title as string)?? "",
-    subheading:(data.subheading as string) ?? "",
+    title: (data.title as string) ?? "",
+    subheading: (data.subheading as string) ?? "",
     items:
-     rawItems.length>0
-     ? rawItems.map((item)=>({
-     icon: typeof item.icon === "string" ? item.icon : "",
-      title:(item.title as string)??"",
-      description:(item.description as string)?? "",
-     })):[{icon:"",title:"",description:""}]
-  }
+      rawItems.length > 0
+        ? rawItems.map((item) => ({
+            icon: typeof item.icon === "string" ? item.icon : "",
+            title: (item.title as string) ?? "",
+            description: (item.description as string) ?? "",
+          }))
+        : [{ icon: "", title: "", description: "" }],
+  };
 }
 
 export function WhyChooseSectionForm({
@@ -674,8 +893,8 @@ export function WhyChooseSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -707,23 +926,26 @@ export function WhyChooseSectionForm({
           >
             <label>
               Icon
-              <Controller 
-              control={control}
-              name={`items.${index}.icon`}
-              defaultValue=""
-              rules={{required:true}}
-              render={({field})=>(
-                <IconPicker
-                  value={typeof field.value === "string" ? field.value : ""}
-                  onChange={(val) => field.onChange(typeof val === "string" ? val : "")}
-                />
-              )}
-              /> 
-              
+              <Controller
+                control={control}
+                name={`items.${index}.icon`}
+                defaultValue=""
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <IconPicker
+                    value={typeof field.value === "string" ? field.value : ""}
+                    onChange={(val) =>
+                      field.onChange(typeof val === "string" ? val : "")
+                    }
+                  />
+                )}
+              />
             </label>
             <label>
               Title
-              <input  {...register(`items.${index}.title`, { required: true })}/>
+              <input
+                {...register(`items.${index}.title`, { required: true })}
+              />
             </label>
             {/* <label>
               Icon
@@ -760,7 +982,7 @@ export function WhyChooseSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -865,8 +1087,8 @@ export function InvestmentSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -904,21 +1126,22 @@ export function InvestmentSectionForm({
               borderRadius: 12,
             }}
           >
-             <label>
+            <label>
               Icon
-              <Controller 
-              control={control}
-              name={`items.${index}.icon`}
-              defaultValue=""
-              rules={{required:true}}
-              render={({field})=>(
-                <IconPicker
-                  value={typeof field.value === "string" ? field.value : ""}
-                  onChange={(val) => field.onChange(typeof val === "string" ? val : "")}
-                />
-              )}
-              /> 
-              
+              <Controller
+                control={control}
+                name={`items.${index}.icon`}
+                defaultValue=""
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <IconPicker
+                    value={typeof field.value === "string" ? field.value : ""}
+                    onChange={(val) =>
+                      field.onChange(typeof val === "string" ? val : "")
+                    }
+                  />
+                )}
+              />
             </label>
             <label>
               Title
@@ -968,7 +1191,9 @@ export function InvestmentSectionForm({
         <label>
           Quote author
           <input
-            {...register("quoteAuthor", { required: "Quote author is required" })}
+            {...register("quoteAuthor", {
+              required: "Quote author is required",
+            })}
           />
           {errors.quoteAuthor ? (
             <p className="admin-field-error">{errors.quoteAuthor.message}</p>
@@ -991,7 +1216,7 @@ export function InvestmentSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -1051,8 +1276,8 @@ export function ClientLogosSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -1117,7 +1342,7 @@ export function ClientLogosSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -1171,8 +1396,8 @@ export function CtaSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -1234,7 +1459,7 @@ export function CtaSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -1250,17 +1475,15 @@ type AboutCtaFormValues = {
 function toAboutCtaDefaultValues(
   data: Record<string, unknown>,
 ): AboutCtaFormValues {
-  const primaryAction = ((data.primaryAction as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
-  const secondaryAction = ((data.secondaryAction as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
+  const primaryAction = ((data.primaryAction as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
+  const secondaryAction = ((data.secondaryAction as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
 
   return {
-    titleLines: Array.isArray(data.title) ? (data.title as string[]).join("\n") : "",
+    titleLines: Array.isArray(data.title)
+      ? (data.title as string[]).join("\n")
+      : "",
     description: (data.description as string) ?? "",
     primaryActionLabel: (primaryAction.label as string) ?? "",
     primaryActionHref: (primaryAction.href as string) ?? "",
@@ -1305,8 +1528,8 @@ export function AboutCtaSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -1348,7 +1571,9 @@ export function AboutCtaSectionForm({
             })}
           />
           {errors.primaryActionLabel ? (
-            <p className="admin-field-error">{errors.primaryActionLabel.message}</p>
+            <p className="admin-field-error">
+              {errors.primaryActionLabel.message}
+            </p>
           ) : null}
         </label>
         <label>
@@ -1359,7 +1584,9 @@ export function AboutCtaSectionForm({
             })}
           />
           {errors.primaryActionHref ? (
-            <p className="admin-field-error">{errors.primaryActionHref.message}</p>
+            <p className="admin-field-error">
+              {errors.primaryActionHref.message}
+            </p>
           ) : null}
         </label>
       </div>
@@ -1374,7 +1601,9 @@ export function AboutCtaSectionForm({
             })}
           />
           {errors.secondaryActionLabel ? (
-            <p className="admin-field-error">{errors.secondaryActionLabel.message}</p>
+            <p className="admin-field-error">
+              {errors.secondaryActionLabel.message}
+            </p>
           ) : null}
         </label>
         <label>
@@ -1385,7 +1614,9 @@ export function AboutCtaSectionForm({
             })}
           />
           {errors.secondaryActionHref ? (
-            <p className="admin-field-error">{errors.secondaryActionHref.message}</p>
+            <p className="admin-field-error">
+              {errors.secondaryActionHref.message}
+            </p>
           ) : null}
         </label>
       </div>
@@ -1396,7 +1627,7 @@ export function AboutCtaSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -1439,8 +1670,8 @@ export function ContactSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -1477,7 +1708,7 @@ export function ContactSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -1534,8 +1765,8 @@ export function ContactHeroSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -1602,7 +1833,7 @@ export function ContactHeroSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -1625,18 +1856,16 @@ type IndustriesHeroFormValues = {
 function toIndustriesHeroDefaultValues(
   data: Record<string, unknown>,
 ): IndustriesHeroFormValues {
-  const primaryAction = ((data.primaryAction as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
-  const secondaryAction = ((data.secondaryAction as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
+  const primaryAction = ((data.primaryAction as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
+  const secondaryAction = ((data.secondaryAction as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
 
   return {
     badge: (data.badge as string) ?? "",
-    titleLines: Array.isArray(data.title) ? (data.title as string[]).join("\n") : "",
+    titleLines: Array.isArray(data.title)
+      ? (data.title as string[]).join("\n")
+      : "",
     description: (data.description as string) ?? "",
     primaryLabel: (primaryAction.label as string) ?? "",
     primaryHref: (primaryAction.href as string) ?? "",
@@ -1644,16 +1873,18 @@ function toIndustriesHeroDefaultValues(
     secondaryHref: (secondaryAction.href as string) ?? "",
   };
 }
-type ServicesHeroFormValues={
+type ServicesHeroFormValues = {
   titleLines: string;
   description: string;
   backgroundImage: string;
-}
+};
 function toServicesHeroDefaultValues(
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): ServicesHeroFormValues {
   return {
-    titleLines: Array.isArray(data.title) ? (data.title as string[]).join("\n") : "",
+    titleLines: Array.isArray(data.title)
+      ? (data.title as string[]).join("\n")
+      : "",
     description: (data.description as string) ?? "",
     backgroundImage: (data.backgroundImage as string) ?? "",
   };
@@ -1664,31 +1895,33 @@ export function ServicesHeroSectionForm({
   previewHref,
   saveMessage,
   saveMessageTone,
-}:SectionFormProps){
+}: SectionFormProps) {
   const defaultValues = useMemo(
-    ()=> toServicesHeroDefaultValues(section.data),
-    [section.data]
+    () => toServicesHeroDefaultValues(section.data),
+    [section.data],
   );
   const {
     register,
     control,
     setValue,
     handleSubmit,
-    formState:{ errors, isSubmitting },
-    
-  }=useForm<ServicesHeroFormValues>({defaultValues});
-  const backgroundImage=useWatch({control,name:"backgroundImage"});
+    formState: { errors, isSubmitting },
+  } = useForm<ServicesHeroFormValues>({ defaultValues });
+  const backgroundImage = useWatch({ control, name: "backgroundImage" });
 
-  function handleValid(values: ServicesHeroFormValues){
+  function handleValid(values: ServicesHeroFormValues) {
     onSave({
-      title:values.titleLines.split("\n").map((line)=>line.trim()).filter(Boolean),
-      description:values.description,
-      backgroundImage:values.backgroundImage,
-    })
+      title: values.titleLines
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean),
+      description: values.description,
+      backgroundImage: values.backgroundImage,
+    });
   }
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -1753,10 +1986,8 @@ export function ServicesHeroSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
-  
-
 }
 
 export function IndustriesHeroSectionForm({
@@ -1801,8 +2032,8 @@ export function IndustriesHeroSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -1824,7 +2055,9 @@ export function IndustriesHeroSectionForm({
         Title lines (one per line)
         <textarea
           rows={4}
-          {...register("titleLines", { required: "At least one title line is required" })}
+          {...register("titleLines", {
+            required: "At least one title line is required",
+          })}
         />
         {errors.titleLines ? (
           <p className="admin-field-error">{errors.titleLines.message}</p>
@@ -1847,7 +2080,9 @@ export function IndustriesHeroSectionForm({
         <label>
           Label
           <input
-            {...register("primaryLabel", { required: "Primary label is required" })}
+            {...register("primaryLabel", {
+              required: "Primary label is required",
+            })}
           />
           {errors.primaryLabel ? (
             <p className="admin-field-error">{errors.primaryLabel.message}</p>
@@ -1856,7 +2091,9 @@ export function IndustriesHeroSectionForm({
         <label>
           Href
           <input
-            {...register("primaryHref", { required: "Primary href is required" })}
+            {...register("primaryHref", {
+              required: "Primary href is required",
+            })}
           />
           {errors.primaryHref ? (
             <p className="admin-field-error">{errors.primaryHref.message}</p>
@@ -1869,7 +2106,9 @@ export function IndustriesHeroSectionForm({
         <label>
           Label
           <input
-            {...register("secondaryLabel", { required: "Secondary label is required" })}
+            {...register("secondaryLabel", {
+              required: "Secondary label is required",
+            })}
           />
           {errors.secondaryLabel ? (
             <p className="admin-field-error">{errors.secondaryLabel.message}</p>
@@ -1878,7 +2117,9 @@ export function IndustriesHeroSectionForm({
         <label>
           Href
           <input
-            {...register("secondaryHref", { required: "Secondary href is required" })}
+            {...register("secondaryHref", {
+              required: "Secondary href is required",
+            })}
           />
           {errors.secondaryHref ? (
             <p className="admin-field-error">{errors.secondaryHref.message}</p>
@@ -1892,7 +2133,7 @@ export function IndustriesHeroSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -1917,10 +2158,8 @@ function toIndustriesGridDefaultValues(
   const rawItems = Array.isArray(data.items)
     ? (data.items as Record<string, unknown>[])
     : [];
-  const partnerCard = ((data.partnerCard as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
+  const partnerCard = ((data.partnerCard as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
 
   return {
     title: (data.title as string) ?? "",
@@ -1987,8 +2226,8 @@ export function IndustriesGridSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -2032,19 +2271,25 @@ export function IndustriesGridSectionForm({
             <label>
               Icon
               <Controller
-              control={control}
-              name={`items.${index}.icon`}
-              defaultValue=""
-              rules={{required:true}}
-              render={({field})=>(
-                <IconPicker value={typeof field.value==="string"?field.value:""}
-                onChange={(val)=>field.onChange(typeof val==="string"?val:"")}/>
-              )}/>
-
+                control={control}
+                name={`items.${index}.icon`}
+                defaultValue=""
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <IconPicker
+                    value={typeof field.value === "string" ? field.value : ""}
+                    onChange={(val) =>
+                      field.onChange(typeof val === "string" ? val : "")
+                    }
+                  />
+                )}
+              />
             </label>
             <label>
               Title
-              <input {...register(`items.${index}.title`, { required: true })} />
+              <input
+                {...register(`items.${index}.title`, { required: true })}
+              />
             </label>
             <label>
               Description
@@ -2065,7 +2310,9 @@ export function IndustriesGridSectionForm({
         <button
           type="button"
           className="admin-button-secondary"
-          onClick={() => append({ icon: "SquareCode", title: "", description: "" })}
+          onClick={() =>
+            append({ icon: "SquareCode", title: "", description: "" })
+          }
         >
           Add card
         </button>
@@ -2075,7 +2322,11 @@ export function IndustriesGridSectionForm({
         <h4>Partner card</h4>
         <label>
           Title
-          <input {...register("partnerTitle", { required: "Partner title is required" })} />
+          <input
+            {...register("partnerTitle", {
+              required: "Partner title is required",
+            })}
+          />
           {errors.partnerTitle ? (
             <p className="admin-field-error">{errors.partnerTitle.message}</p>
           ) : null}
@@ -2089,12 +2340,18 @@ export function IndustriesGridSectionForm({
             })}
           />
           {errors.partnerDescription ? (
-            <p className="admin-field-error">{errors.partnerDescription.message}</p>
+            <p className="admin-field-error">
+              {errors.partnerDescription.message}
+            </p>
           ) : null}
         </label>
         <label>
           Href
-          <input {...register("partnerHref", { required: "Partner href is required" })} />
+          <input
+            {...register("partnerHref", {
+              required: "Partner href is required",
+            })}
+          />
           {errors.partnerHref ? (
             <p className="admin-field-error">{errors.partnerHref.message}</p>
           ) : null}
@@ -2107,7 +2364,7 @@ export function IndustriesGridSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -2129,15 +2386,13 @@ type ServicesCtaFormValues = {
   secondaryHref: string;
 };
 
-function toServicesCtaDefaultValues(data: Record<string, unknown>): ServicesCtaFormValues {
-  const primaryAction = ((data.primaryAction as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
-  const secondaryAction = ((data.secondaryAction as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
+function toServicesCtaDefaultValues(
+  data: Record<string, unknown>,
+): ServicesCtaFormValues {
+  const primaryAction = ((data.primaryAction as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
+  const secondaryAction = ((data.secondaryAction as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
 
   return {
     title: (data.title as string) ?? "",
@@ -2187,8 +2442,8 @@ export function ServicesCtaSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -2221,14 +2476,22 @@ export function ServicesCtaSectionForm({
         <h4>Primary action</h4>
         <label>
           Label
-          <input {...register("primaryLabel", { required: "Primary label is required" })} />
+          <input
+            {...register("primaryLabel", {
+              required: "Primary label is required",
+            })}
+          />
           {errors.primaryLabel ? (
             <p className="admin-field-error">{errors.primaryLabel.message}</p>
           ) : null}
         </label>
         <label>
           Href
-          <input {...register("primaryHref", { required: "Primary href is required" })} />
+          <input
+            {...register("primaryHref", {
+              required: "Primary href is required",
+            })}
+          />
           {errors.primaryHref ? (
             <p className="admin-field-error">{errors.primaryHref.message}</p>
           ) : null}
@@ -2239,14 +2502,22 @@ export function ServicesCtaSectionForm({
         <h4>Secondary action</h4>
         <label>
           Label
-          <input {...register("secondaryLabel", { required: "Secondary label is required" })} />
+          <input
+            {...register("secondaryLabel", {
+              required: "Secondary label is required",
+            })}
+          />
           {errors.secondaryLabel ? (
             <p className="admin-field-error">{errors.secondaryLabel.message}</p>
           ) : null}
         </label>
         <label>
           Href
-          <input {...register("secondaryHref", { required: "Secondary href is required" })} />
+          <input
+            {...register("secondaryHref", {
+              required: "Secondary href is required",
+            })}
+          />
           {errors.secondaryHref ? (
             <p className="admin-field-error">{errors.secondaryHref.message}</p>
           ) : null}
@@ -2259,24 +2530,22 @@ export function ServicesCtaSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
 function toIndustriesCtaDefaultValues(
   data: Record<string, unknown>,
 ): IndustriesCtaFormValues {
-  const primaryAction = ((data.primaryAction as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
-  const secondaryAction = ((data.secondaryAction as Record<string, unknown>) ?? {}) as Record<
-    string,
-    unknown
-  >;
+  const primaryAction = ((data.primaryAction as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
+  const secondaryAction = ((data.secondaryAction as Record<string, unknown>) ??
+    {}) as Record<string, unknown>;
 
   return {
-    titleLines: Array.isArray(data.title) ? (data.title as string[]).join("\n") : "",
+    titleLines: Array.isArray(data.title)
+      ? (data.title as string[]).join("\n")
+      : "",
     description: (data.description as string) ?? "",
     primaryLabel: (primaryAction.label as string) ?? "",
     primaryHref: (primaryAction.href as string) ?? "",
@@ -2326,8 +2595,8 @@ export function IndustriesCtaSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -2341,7 +2610,9 @@ export function IndustriesCtaSectionForm({
         Title lines (one per line)
         <textarea
           rows={3}
-          {...register("titleLines", { required: "At least one title line is required" })}
+          {...register("titleLines", {
+            required: "At least one title line is required",
+          })}
         />
         {errors.titleLines ? (
           <p className="admin-field-error">{errors.titleLines.message}</p>
@@ -2363,14 +2634,22 @@ export function IndustriesCtaSectionForm({
         <h4>Primary action</h4>
         <label>
           Label
-          <input {...register("primaryLabel", { required: "Primary label is required" })} />
+          <input
+            {...register("primaryLabel", {
+              required: "Primary label is required",
+            })}
+          />
           {errors.primaryLabel ? (
             <p className="admin-field-error">{errors.primaryLabel.message}</p>
           ) : null}
         </label>
         <label>
           Href
-          <input {...register("primaryHref", { required: "Primary href is required" })} />
+          <input
+            {...register("primaryHref", {
+              required: "Primary href is required",
+            })}
+          />
           {errors.primaryHref ? (
             <p className="admin-field-error">{errors.primaryHref.message}</p>
           ) : null}
@@ -2381,14 +2660,22 @@ export function IndustriesCtaSectionForm({
         <h4>Secondary action</h4>
         <label>
           Label
-          <input {...register("secondaryLabel", { required: "Secondary label is required" })} />
+          <input
+            {...register("secondaryLabel", {
+              required: "Secondary label is required",
+            })}
+          />
           {errors.secondaryLabel ? (
             <p className="admin-field-error">{errors.secondaryLabel.message}</p>
           ) : null}
         </label>
         <label>
           Href
-          <input {...register("secondaryHref", { required: "Secondary href is required" })} />
+          <input
+            {...register("secondaryHref", {
+              required: "Secondary href is required",
+            })}
+          />
           {errors.secondaryHref ? (
             <p className="admin-field-error">{errors.secondaryHref.message}</p>
           ) : null}
@@ -2401,7 +2688,7 @@ export function IndustriesCtaSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -2497,8 +2784,8 @@ export function ContactInquirySectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -2594,10 +2881,16 @@ export function ContactInquirySectionForm({
               />
             </label>
             <label>
-              Icon name
-              <input
-                {...register(`officeItems.${index}.icon`, { required: true })}
-                placeholder="location"
+              choose an Icon
+              <Controller
+                control={control}
+                name={`officeItems.${index}.icon`}
+                render={({ field }) => (
+                  <IconPicker
+                    value={typeof field.value === "string" ? field.value : ""}
+                    onChange={(val) => field.onChange(val)}
+                  />
+                )}
               />
             </label>
             <button
@@ -2667,7 +2960,7 @@ export function ContactInquirySectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -2716,8 +3009,8 @@ export function AboutHeroSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -2773,7 +3066,7 @@ export function AboutHeroSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -2791,7 +3084,9 @@ function toAboutIntroDefaultValues(
 ): AboutIntroFormValues {
   return {
     badge: (data.badge as string) ?? "",
-    titleLines: Array.isArray(data.title) ? (data.title as string[]).join("\n") : "",
+    titleLines: Array.isArray(data.title)
+      ? (data.title as string[]).join("\n")
+      : "",
     descriptionLines: Array.isArray(data.description)
       ? (data.description as string[]).join("\n\n")
       : "",
@@ -2839,8 +3134,8 @@ export function AboutIntroSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -2884,7 +3179,11 @@ export function AboutIntroSectionForm({
 
       <label>
         Image Caption
-        <input {...register("imageCaption", { required: "Image caption is required" })} />
+        <input
+          {...register("imageCaption", {
+            required: "Image caption is required",
+          })}
+        />
         {errors.imageCaption ? (
           <p className="admin-field-error">{errors.imageCaption.message}</p>
         ) : null}
@@ -2917,7 +3216,7 @@ export function AboutIntroSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -2996,8 +3295,8 @@ export function AboutVisionMissionSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -3034,12 +3333,18 @@ export function AboutVisionMissionSectionForm({
             </label>
             <label>
               Choose Icon
-             <Controller
-             control={control}
-             name={`items.${index}.icon`}
-             render={({ field }) => (
-               <IconPicker value={typeof field.value==="string"?field.value:""} onChange={(val)=>field.onChange(typeof val==="string"?val:"")}/>
-             )}/>
+              <Controller
+                control={control}
+                name={`items.${index}.icon`}
+                render={({ field }) => (
+                  <IconPicker
+                    value={typeof field.value === "string" ? field.value : ""}
+                    onChange={(val) =>
+                      field.onChange(typeof val === "string" ? val : "")
+                    }
+                  />
+                )}
+              />
             </label>
             {/* <input type="hidden" {...register(`cards.${index}.iconImage`)} />
             <ImageUploadField
@@ -3092,7 +3397,7 @@ export function AboutVisionMissionSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -3157,8 +3462,8 @@ export function AboutAdvantageSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -3233,7 +3538,7 @@ export function AboutAdvantageSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }
 
@@ -3304,8 +3609,8 @@ export function AboutValuesSectionForm({
   }
 
   return (
-    <form
-      className="admin-form"
+    <SectionForm
+      className="admin-form admin-section-form"
       onSubmit={handleSubmit(handleValid)}
       style={{
         marginBottom: 24,
@@ -3349,13 +3654,17 @@ export function AboutValuesSectionForm({
               />
             </label>
             <label>
-              Icon 
+              Icon
               <Controller
                 name={`items.${index}.icon`}
                 control={control}
                 render={({ field }) => (
-                  <IconPicker value={typeof field.value==="string"?field.value:""}
-                  onChange={(val)=>field.onChange(typeof val==="string"?val:"")}/>
+                  <IconPicker
+                    value={typeof field.value === "string" ? field.value : ""}
+                    onChange={(val) =>
+                      field.onChange(typeof val === "string" ? val : "")
+                    }
+                  />
                 )}
               />
             </label>
@@ -3397,6 +3706,6 @@ export function AboutValuesSectionForm({
         messageTone={saveMessageTone}
         previewHref={previewHref}
       />
-    </form>
+    </SectionForm>
   );
 }

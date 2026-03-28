@@ -37,6 +37,10 @@ export const introDataSchema = z.object({
   description: z.string(),
   highlights: z.array(z.string()),
   image: z.string(),
+  more: z.string().optional(),
+  icon: z.string().optional(),
+  expcount: z.number(),
+  // exptext: z.string(),
 });
 
 const serviceCardSchema = z.object({

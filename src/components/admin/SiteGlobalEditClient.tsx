@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ImageUploadField from "@/components/admin/ImageUploadField";
+import IconPicker from "./IconPicker";
 
 type NavItem = { label: string; href: string };
 type PageSummary = { slug: string; title: string };
@@ -13,41 +14,32 @@ type FooterLinkColumn = { title: string; links: FooterLink[] };
 type FooterContactColumn = { title: string; contact: ContactRow[] };
 type FooterColumn = FooterLinkColumn | FooterContactColumn;
 
-function formatMetaLinks(
-  items: Array<string | FooterMetaLink>,
-  fallbackHref: string,
-  withIcon: boolean,
-) {
+function formatMetaLinks(items: Array<string | FooterMetaLink>, fallbackHref: string) {
   return items
     .map((item) => {
       if (typeof item === "string") {
-        return withIcon ? `globe|${item}|${fallbackHref}` : `${item}|${fallbackHref}`;
-      }
-      if (withIcon) {
-        const icon = item.icon ?? "globe";
-        return `${icon}|${item.label}|${item.href || fallbackHref}`;
+        return `${item}|${fallbackHref}`;
       }
       return `${item.label}|${item.href || fallbackHref}`;
     })
     .join("\n");
 }
 
-function parseSocialMetaLinks(input: string): FooterMetaLink[] {
-  return input
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const parts = line.split("|").map((part) => part.trim());
-      if (parts.length >= 3) {
-        return { icon: parts[0], label: parts[1], href: parts[2] || "/contact" };
+function toEditableSocialLinks(items: Array<string | FooterMetaLink>): FooterMetaLink[] {
+  const normalized = items
+    .map((item) => {
+      if (typeof item === "string") {
+        return { icon: "globe", label: item, href: "/contact" };
       }
-      if (parts.length === 2) {
-        return { label: parts[0], href: parts[1] || "/contact" };
-      }
-      return { label: parts[0], href: "/contact" };
+      return {
+        icon: item.icon || "globe",
+        label: item.label || "",
+        href: item.href || "/contact",
+      };
     })
-    .filter((item) => item.label);
+    .filter((item) => item.label || item.href || item.icon);
+
+  return normalized.length > 0 ? normalized : [{ icon: "globe", label: "", href: "/contact" }];
 }
 
 function parseLegalMetaLinks(input: string): FooterMetaLink[] {
@@ -92,7 +84,9 @@ export default function SiteGlobalEditClient() {
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [copyright, setCopyright] = useState("");
-  const [socialLinks, setSocialLinks] = useState("");
+  const [socialLinks, setSocialLinks] = useState<FooterMetaLink[]>([
+    { icon: "globe", label: "", href: "/contact" },
+  ]);
   const [legalLinks, setLegalLinks] = useState("");
   const [clientLogosFlag, setClientLogosFlag] = useState(true);
 
@@ -115,8 +109,10 @@ export default function SiteGlobalEditClient() {
         setBrand(d.footerMeta?.brand ?? "");
         setDescription(d.footerMeta?.description ?? "");
         setCopyright(d.footerMeta?.copyright ?? "");
-        setSocialLinks(formatMetaLinks((d.footerMeta?.social ?? []) as Array<string | FooterMetaLink>, "/contact", true));
-        setLegalLinks(formatMetaLinks((d.footerMeta?.legal ?? []) as Array<string | FooterMetaLink>, "/contact", false));
+        setSocialLinks(
+          toEditableSocialLinks((d.footerMeta?.social ?? []) as Array<string | FooterMetaLink>),
+        );
+        setLegalLinks(formatMetaLinks((d.footerMeta?.legal ?? []) as Array<string | FooterMetaLink>, "/contact"));
         setClientLogosFlag(d.featureFlags?.clientLogos !== false);
       } catch (e) {
         if (!cancelled) setMessage(e instanceof Error ? e.message : "Load error");
@@ -255,6 +251,25 @@ export default function SiteGlobalEditClient() {
     setFooterColumns((prev) => prev.filter((_, columnIndex) => columnIndex !== index));
   }
 
+  function updateSocialLink(index: number, field: keyof FooterMetaLink, value: string) {
+    setSocialLinks((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  }
+
+  function addSocialLink() {
+    setSocialLinks((prev) => [...prev, { icon: "globe", label: "", href: "/contact" }]);
+  }
+
+  function removeSocialLink(index: number) {
+    setSocialLinks((prev) => {
+      const next = prev.filter((_, itemIndex) => itemIndex !== index);
+      return next.length > 0 ? next : [{ icon: "globe", label: "", href: "/contact" }];
+    });
+  }
+
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -266,7 +281,13 @@ export default function SiteGlobalEditClient() {
       footerMeta: {
         brand,
         description,
-        social: parseSocialMetaLinks(socialLinks),
+        social: socialLinks
+          .map((item) => ({
+            icon: (item.icon || "globe").trim(),
+            label: item.label.trim(),
+            href: (item.href || "/contact").trim() || "/contact",
+          }))
+          .filter((item) => item.label),
         copyright,
         legal: parseLegalMetaLinks(legalLinks),
       },
@@ -538,15 +559,52 @@ export default function SiteGlobalEditClient() {
             Copyright
             <input value={copyright} onChange={(e) => setCopyright(e.target.value)} />
           </label>
-          <label>
-            Social links (one per line: icon|label|href)
-            <textarea
-              rows={4}
-              value={socialLinks}
-              onChange={(e) => setSocialLinks(e.target.value)}
-              placeholder="globe|Global|/contact"
-            />
-          </label>
+          <div style={{ display: "grid", gap: 10 }}>
+            <h3 style={{ margin: "0 0 4px" }}>Social links</h3>
+            <p className="admin-muted" style={{ margin: 0 }}>
+              Add multiple social links and choose an icon for each one.
+            </p>
+            {socialLinks.map((item, index) => (
+              <div
+                key={`${item.label}-${index}`}
+                style={{
+                  display: "grid",
+                  gap: 8,
+                  padding: 12,
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 10,
+                }}
+              >
+                <label>
+                  Icon
+                  <IconPicker
+                    value={item.icon ?? "globe"}
+                    onChange={(val) => updateSocialLink(index, "icon", val)}
+                  />
+                </label>
+                <input
+                  value={item.label}
+                  onChange={(e) => updateSocialLink(index, "label", e.target.value)}
+                  placeholder="Instagram"
+                />
+                <input
+                  value={item.href}
+                  onChange={(e) => updateSocialLink(index, "href", e.target.value)}
+                  placeholder="https://instagram.com/yourpage"
+                />
+                <button
+                  type="button"
+                  className="admin-button-secondary"
+                  onClick={() => removeSocialLink(index)}
+                >
+                  Remove social link
+                </button>
+              </div>
+            ))}
+            <button type="button" className="admin-button-secondary" onClick={addSocialLink}>
+              Add social link
+            </button>
+          </div>
           <label>
             Legal links (one per line: label|href)
             <textarea

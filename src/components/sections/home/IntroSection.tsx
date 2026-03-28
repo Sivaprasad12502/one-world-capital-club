@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import type { introDataSchema } from "@/schemas/sections";
+import * as Icons from 'lucide-react'
 import SimpleIcon from "../SimpleIcon";
 
 type IntroContent = z.infer<typeof introDataSchema>;
@@ -11,6 +12,8 @@ export default function IntroSection({
   content: IntroContent;
   anchorId?: string;
 }) {
+  console.log("IntroSection content:", content)
+  const IconComponent= content.icon ? (Icons[content.icon as keyof typeof Icons ]) as React.ElementType : null;
 
   return (
     <section className="intro-section section-shell" id={anchorId ?? undefined}>
@@ -35,8 +38,8 @@ export default function IntroSection({
             ))}
           </ul>
           <div className="intro-section__more">
-            <span>Read More About Us</span>
-            <SimpleIcon name="right-arrow" className="intro-section__check"/>
+            <span>{content.more}</span>
+            {IconComponent && <IconComponent className="intro-section__check"/>}
             
           </div>
         </div>
@@ -51,7 +54,7 @@ export default function IntroSection({
             className="intro-section__image"
           />
           <div className="intro-section__stats">
-            <span className="count">15+</span>
+            <span className="count">{content.expcount}+</span>
             <span className="year">YEARS OF INSIGHT</span>
           </div>
         </div>

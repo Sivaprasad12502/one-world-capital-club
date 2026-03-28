@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Globe, Landmark, Mail, Phone } from "lucide-react";
+import { Globe, Landmark, Mail, Phone, icons, type LucideIcon } from "lucide-react";
 
 type FooterLink = { label: string; href: string };
 type ContactRow = { type: "location" | "phone" | "mail"; value: string };
@@ -29,7 +29,28 @@ function normalizeMetaLinks(
 }
 
 function SocialIcon({ token }: { token?: string }) {
-  const key = (token ?? "").trim().toLowerCase();
+  const raw = (token ?? "").trim();
+  const key = raw.toLowerCase();
+
+  const fromPicker = (() => {
+    if (!raw) return null;
+    const exact = icons[raw as keyof typeof icons] as LucideIcon | undefined;
+    if (exact) return exact;
+
+    const pascal = raw
+      .replace(/[-_\s]+/g, " ")
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join("");
+    return (icons[pascal as keyof typeof icons] as LucideIcon | undefined) ?? null;
+  })();
+
+  if (fromPicker) {
+    const Icon = fromPicker;
+    return <Icon aria-hidden="true" />;
+  }
+
   if (key.includes("mail") || key.includes("email")) {
     return <Mail aria-hidden="true" />;
   }

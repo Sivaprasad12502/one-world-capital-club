@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import type { z } from "zod";
 import type { contactInquiryDataSchema } from "@/schemas/sections";
+import * as Icons from 'lucide-react'
 import SimpleIcon from "../SimpleIcon";
 
 type ContactInquiryContent = z.infer<typeof contactInquiryDataSchema>;
@@ -133,10 +134,12 @@ export default function ContactInquirySection({ content }: { content: ContactInq
           <h2 className="contact-inquiry__office-title">{content.officeHeading}</h2>
 
           <div className="contact-inquiry__details-list">
-            {content.officeItems.map((item) => (
+            {content.officeItems.map((item) => {
+              const Icon=item.icon? Icons[item.icon as keyof typeof Icons] as React.ElementType : null;
+              return(
               <article key={item.title} className="contact-inquiry__detail-item">
                 <div className="contact-inquiry__detail-icon">
-                  <SimpleIcon name={item.icon} className="contact-inquiry__detail-icon-svg" />
+                 {Icon &&  <Icon className="contact-inquiry__detail-icon-svg" />}
                 </div>
                 <div className="contact-inquiry__detail-copy">
                   <h3>{item.title.toUpperCase()}</h3>
@@ -145,7 +148,8 @@ export default function ContactInquirySection({ content }: { content: ContactInq
                   ))}
                 </div>
               </article>
-            ))}
+            )
+            })}
           </div>
 
           <div className="contact-inquiry__map">
