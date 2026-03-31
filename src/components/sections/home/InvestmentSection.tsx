@@ -64,7 +64,7 @@ export default function InvestmentSection({ content }: { content: InvestmentCont
               return(
                 <article key={`${item.title}-${index}`} className="investment-feature">
                 <div className="investment-feature__icon" aria-hidden="true">
-                  {Icon ? <Icon size={14}/>: null}
+                  {Icon ? <Icon size={24}/>: null}
                  
                 </div>
                 <div className="investment-feature__body">
