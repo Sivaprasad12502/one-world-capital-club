@@ -1,7 +1,8 @@
 "use client";
 import type { z } from "zod";
 import * as Icons from "lucide-react";
-import type {useState, ElementType } from "react";
+import {useState} from 'react'
+import type { ElementType } from "react";
 import type { servicesGridDataSchema } from "@/schemas/sections";
 
 type ServicesGridContent = z.infer<typeof servicesGridDataSchema>;
