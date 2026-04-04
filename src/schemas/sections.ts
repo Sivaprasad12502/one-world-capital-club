@@ -188,7 +188,7 @@ export const serviceHeroDataSchema=z.object({
 })
 
 export const aboutHeroDataSchema = z.object({
-  title: z.array(z.string()),
+  title: z.string(),
   description: z.string(),
   backgroundImage: z.string(),
 });

@@ -1,13 +1,14 @@
+"use client";
 import type { z } from "zod";
 import * as Icons from "lucide-react";
-import type { ElementType } from "react";
+import type {useState, ElementType } from "react";
 import type { servicesGridDataSchema } from "@/schemas/sections";
 
 type ServicesGridContent = z.infer<typeof servicesGridDataSchema>;
 
 const ServicesGridSection = ({ content }: { content: ServicesGridContent }) => {
   const filters = content.filters.length > 0 ? content.filters : ["All Services"];
-
+  const [activeButton, setActiveButton]=useState(0)
   return (
     <section className="services-grid-section">
       <div className="section-shell">
@@ -23,7 +24,8 @@ const ServicesGridSection = ({ content }: { content: ServicesGridContent }) => {
                 type="button"
                 role="tab"
                 aria-selected={index === 0}
-                className={`services-grid-section__filter ${index === 0 ? "is-active" : ""}`}
+                className={`services-grid-section__filter ${index === activeButton ? "is-active" : ""}`}
+                onClick={()=>setActiveButton(index)}
               >
                 {filter}
               </button>

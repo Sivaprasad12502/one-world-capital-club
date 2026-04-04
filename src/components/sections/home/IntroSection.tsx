@@ -19,7 +19,7 @@ export default function IntroSection({
     <section className="intro-section section-shell" id={anchorId ?? undefined}>
       <div className="intro-section__content">
         <div className="intro-section__copy">
-          <div className="section-accent"></div>
+          {/* <div className="section-accent"></div> */}
           <p className="section-label">{content.eyebrow}</p>
           <h2 className="section-title">
             {content.title.map((line) => (
@@ -54,7 +54,7 @@ export default function IntroSection({
             className="intro-section__image"
           />
           <div className="intro-section__stats">
-            <span className="count">{content.expcount}+</span>
+            <span className="count">{content.expcount+1}+</span>
             <span className="year">YEARS OF INSIGHT</span>
           </div>
         </div>
