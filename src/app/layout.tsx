@@ -3,11 +3,11 @@ import "../styles.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "One World Trade Centre FZE",
+    default: "ONE WORLD CAPITAL CLUB LLC",
     template: "%s | OWTC FZE",
   },
   description:
-    "One World Trade Centre FZE — trading, investment, and corporate solutions within the UAE free zone ecosystem.",
+    "ONE WORLD CAPITAL CLUB LLC — trading, investment, and corporate solutions within the UAE free zone ecosystem.",
   metadataBase: new URL(process.env.AUTH_URL ?? "http://localhost:3000"),
 };
 
