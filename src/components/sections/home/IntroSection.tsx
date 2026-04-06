@@ -2,6 +2,7 @@ import type { z } from "zod";
 import type { introDataSchema } from "@/schemas/sections";
 import * as Icons from 'lucide-react'
 import SimpleIcon from "../SimpleIcon";
+import Link from "next/link";
 
 type IntroContent = z.infer<typeof introDataSchema>;
 
@@ -38,7 +39,7 @@ export default function IntroSection({
             ))}
           </ul>
           <div className="intro-section__more">
-            <span>{content.more}</span>
+            <Link href={content.href}>{content.more}</Link>
             {IconComponent && <IconComponent className="intro-section__check"/>}
             
           </div>

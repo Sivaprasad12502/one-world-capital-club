@@ -461,7 +461,8 @@ button {
   margin-top: 32px;
 
 }
-.intro-section__more span{
+.intro-section__more a{
+  cursor: pointer;
   font-weight: 700;
   font-size: 16px;
   line-height: 24px;

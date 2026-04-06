@@ -38,6 +38,7 @@ export const introDataSchema = z.object({
   highlights: z.array(z.string()),
   image: z.string(),
   more: z.string().optional(),
+  href:z.string(),
   icon: z.string().optional(),
   expcount: z.number(),
   // exptext: z.string(),

@@ -164,6 +164,7 @@ type IntroFormValues = {
   highlightsLines: string;
   image: string;
   more: string;
+  href:string;
   icon: string;
   expcount: number;
   // exptext: string;
@@ -181,6 +182,7 @@ function toIntroDefaultValues(data: Record<string, unknown>): IntroFormValues {
       : "",
     image: (data.image as string) ?? "",
     more: (data.more as string) ?? "",
+    href: (data.href as string) ?? "",
     icon: (data.icon as string) ?? "",
     expcount: (data.expcount as number) ?? 0,
     // exptext: (data.exptext as string) ?? "",
@@ -222,6 +224,7 @@ export function IntroSectionForm({
         .filter(Boolean),
       image: values.image,
       more: values.more,
+      href:values.href,
       icon: values.icon,
       expcount: values.expcount,
       // exptext: values.exptext,
@@ -316,6 +319,10 @@ export function IntroSectionForm({
             />
           )}
         />
+      </label>
+      <label>
+        Link URl 
+        <input {...register("href",{required:"Link URL is required"})} placeholder="/about" />
       </label>
       <div>
         <label>
