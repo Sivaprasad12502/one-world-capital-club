@@ -1,8 +1,10 @@
 :root {
   --color-header-bg: rgba(255, 255, 255, 0.9);
   --color-border: #e2e8f0;
-  --color-primary: #0b3d91;
+  /* --color-primary: #0b3d91; */
   --color-primary-dark: #0a1f44;
+  --color-primary:#091E44;
+
   /* --color-accent: #c8a96a; */
   --color-accent:#C9A14A;
   --color-brand-green: #00a86b;
