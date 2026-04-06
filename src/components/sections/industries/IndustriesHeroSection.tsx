@@ -44,7 +44,7 @@ export default function IndustriesHeroSection({
             {safeContent.title.map((line, index) => (
               <span
                 key={`${line}-${index}`}
-                className={index === safeContent.title.length - 1 ? "industries-hero__title-accent" : undefined}
+                className={index === safeContent.title.length - 2 ? "industries-hero__title-accent" : undefined}
               >
                 {line}
               </span>
