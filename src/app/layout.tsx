@@ -4,7 +4,7 @@ import "../styles.css";
 export const metadata: Metadata = {
   title: {
     default: "ONE WORLD CAPITAL CLUB LLC",
-    template: "%s | OWTC FZE",
+    template: "%s | OWCC LLC",
   },
   description:
     "ONE WORLD CAPITAL CLUB LLC — trading, investment, and corporate solutions within the UAE free zone ecosystem.",
