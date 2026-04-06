@@ -584,6 +584,7 @@ button {
 }
 
 .about-hero__title {
+  max-width: 780px;
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(2.35rem, 5.2vw, 3.7rem);
