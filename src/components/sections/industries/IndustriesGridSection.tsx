@@ -130,7 +130,7 @@ export default function IndustriesGridSection({
           )
           })}
 
-          <a className="industries-grid__partner-card" href={safeContent.partnerCard.href}>
+          {/* <a className="industries-grid__partner-card" href={safeContent.partnerCard.href}>
             <span className="industries-grid__partner-icon" aria-hidden="true">
               <PlusCircle />
             </span>
@@ -138,7 +138,7 @@ export default function IndustriesGridSection({
             <p className="industries-grid__partner-description">
               {safeContent.partnerCard.description}
             </p>
-          </a>
+          </a> */}
         </div>
       </div>
     </section>

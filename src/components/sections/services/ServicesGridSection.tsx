@@ -10,6 +10,8 @@ type ServicesGridContent = z.infer<typeof servicesGridDataSchema>;
 const ServicesGridSection = ({ content }: { content: ServicesGridContent }) => {
   const filters = content.filters.length > 0 ? content.filters : ["All Services"];
   const [activeButton, setActiveButton]=useState(0)
+  const activeFilter = filters[activeButton];
+  const filterdCards =activeFilter==="All Services" ? content.cards:content.cards.filter((card)=>card.category.toLowerCase().includes(activeFilter.toLowerCase())),
   return (
     <section className="services-grid-section">
       <div className="section-shell">
@@ -35,7 +37,7 @@ const ServicesGridSection = ({ content }: { content: ServicesGridContent }) => {
         </div>
 
         <div className="services-grid-section__cards">
-          {content.cards.map((card, index) => {
+          {filterdCards.map((card, index) => {
             const Icon = Icons[card.icon as keyof typeof Icons] as ElementType | undefined;
             return (
               <article className="services-grid-card" key={`${card.title}-${index}`}>

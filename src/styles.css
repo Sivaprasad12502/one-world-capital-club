@@ -1119,7 +1119,11 @@ button {
   border: 1px solid #dce1e9;
   background: #ffffff;
 }
-
+.industries-grid__card:hover{
+  border:2px dotted #c9a14a;
+  background-color: #f2efe8;
+  cursor: pointer;
+}
 .industries-grid__card-icon {
   display: inline-flex;
   color: var(--color-accent);
@@ -1189,7 +1193,7 @@ button {
 }
 
 .industries-cta__content {
-  max-width: 760px;
+  /* max-width: 760px; */
   margin: 0 auto;
   text-align: center;
 }
